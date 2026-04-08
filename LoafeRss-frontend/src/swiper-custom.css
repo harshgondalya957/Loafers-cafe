@@ -1,0 +1,50 @@
+/* Swiper Navigation Customization */
+
+/* Remove padding from testimonials swiper so cards clip nicely */
+.testimonials-swiper {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    position: relative !important;
+}
+
+@media (min-width: 768px) {
+    .testimonials-swiper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+/* Custom Navigation Buttons */
+.testi-btn-prev, .testi-btn-next {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(255, 245, 229, 0.5);
+    border-radius: 50%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.testi-btn-prev:hover, .testi-btn-next:hover {
+    background-color: rgba(244, 63, 151, 0.8);
+}
+
+.testi-btn-prev:hover svg, .testi-btn-next:hover svg {
+    color: #FFF5E5 !important;
+}
+
+/* Hide default swiper buttons */
+.testimonials-swiper .swiper-button-prev,
+.testimonials-swiper .swiper-button-next {
+    display: none !important;
+}
+
+/* Ensure equal height cards */
+.testimonials-swiper .swiper-wrapper {
+    align-items: stretch;
+}
+
+.testimonials-swiper .swiper-slide {
+    height: auto;
+}
