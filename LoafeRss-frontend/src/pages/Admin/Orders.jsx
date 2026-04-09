@@ -12,7 +12,7 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    
+
     const token = localStorage.getItem("token");
 
     // Setup for printing the receipt Modal
@@ -24,7 +24,7 @@ const Orders = () => {
 
     useEffect(() => {
         let isSubscribed = true;
-        fetchOrders(); 
+        fetchOrders();
 
         const intervalId = setInterval(() => {
             if (isSubscribed) fetchOrders(true);
@@ -34,7 +34,7 @@ const Orders = () => {
             isSubscribed = false;
             clearInterval(intervalId);
         };
-    }, []); 
+    }, []);
 
     const fetchOrders = async (silent = false) => {
         const url = `http://localhost:5001/api/admin/orders`;
@@ -43,7 +43,7 @@ const Orders = () => {
             const res = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             const fetchedOrders = res.data?.orders || res.data?.data || res.data || [];
             setOrders(Array.isArray(fetchedOrders) ? fetchedOrders : []);
         } catch (error) {
@@ -125,7 +125,7 @@ const Orders = () => {
         <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50 relative">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Orders</h2>
-                
+
                 <button
                     onClick={handleDeleteAllOrders}
                     className="flex items-center px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-100 transition-all transform hover:scale-105"
@@ -170,16 +170,15 @@ const Orders = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-primary">£{(Number(item.total || item.total_amount || 0)).toFixed(2)}</td>
 
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                                                item.status === 'completed' || item.status === 'Delivered' ? 'bg-green-100 text-green-700' :
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${item.status === 'completed' || item.status === 'Delivered' ? 'bg-green-100 text-green-700' :
                                                 item.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-gray-100 text-gray-700'
-                                            }`}>
+                                                    'bg-gray-100 text-gray-700'
+                                                }`}>
                                                 {item.status || item.state || "Pending"}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right whitespace-nowrap">
-                                            <button 
+                                            <button
                                                 onClick={() => {
                                                     setSelectedOrder(item);
                                                     setShowModal(true);
@@ -241,6 +240,15 @@ const Orders = () => {
                                         <div>
                                             <p className="text-sm text-gray-500 print:text-gray-800">Phone</p>
                                             <p className="font-bold text-gray-800 print:text-black">{selectedOrder.customer_phone || 'N/A'}</p>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <p className="text-sm text-gray-500 print:text-gray-800">Address / Pickup Time</p>
+                                            <p className="font-bold text-gray-800 print:text-black">
+                                                {selectedOrder.order_type === 'delivery'
+                                                    ? (selectedOrder.delivery_address || 'No Address Provided')
+                                                    : `Pickup Selection (Scheduled: ${selectedOrder.scheduled_time || 'ASAP'})`
+                                                }
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

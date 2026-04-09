@@ -7,8 +7,8 @@ async function migrate() {
         const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/loafers';
         await mongoose.connect(MONGO_URI);
         console.log('Connected to MongoDB');
-        
-        const orders = await Order.find({ 
+
+        const orders = await Order.find({
             $or: [
                 { tokenNumber: { $exists: false } },
                 { tokenNumber: null },
@@ -16,7 +16,7 @@ async function migrate() {
             ]
         });
         console.log(`Found ${orders.length} orders lacking proper tokenNumber`);
-        
+
         let count = 1;
         for (let order of orders) {
             const tokenStr = `LFR-${String(count).padStart(3, '0')}`;
@@ -26,7 +26,7 @@ async function migrate() {
             count++;
             if (count > 999) count = 1;
         }
-        
+
         console.log('Migration completed successfully');
         process.exit(0);
     } catch (err) {

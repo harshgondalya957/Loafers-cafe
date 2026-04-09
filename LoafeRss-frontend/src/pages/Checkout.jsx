@@ -176,6 +176,9 @@ const Checkout = () => {
         // 4. Payment Method
         if (!paymentMethod) return false;
 
+        // 5. Cart Items
+        if (!cartItems || cartItems.length === 0) return false;
+
         return true;
     };
 
