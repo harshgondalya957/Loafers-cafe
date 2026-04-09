@@ -57,12 +57,24 @@ exports.placeOrder = async (req, res) => {
             await user.save();
         }
 
-        // Check store timings logic
+        // Check store timings logic using UK timezone
         const StoreSettings = require('../models/StoreSettings');
         const settings = await StoreSettings.findOne() || { open_time: '09:00', close_time: '22:00' };
-
         const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
+
+        // Get current time in Europe/London (UK)
+        const ukTimeStr = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/London',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: false
+        }).format(new Date());
+
+        const [ukHour, ukMin] = ukTimeStr.split(':').map(Number);
+        const currentTime = ukHour * 60 + ukMin;
+
+        console.log(`🕒 UK Current Time: ${ukTimeStr} (${currentTime} mins)`);
+        console.log(`🏪 Store Hours: ${settings.open_time} to ${settings.close_time}`);
 
         const openParts = (settings.open_time || '09:00').split(':');
         const closeParts = (settings.close_time || '22:00').split(':');
