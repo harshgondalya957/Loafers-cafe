@@ -40,6 +40,7 @@ import DeliveryOrderDetails from './pages/Delivery/DeliveryOrderDetails';
 import ScrollToTop from './components/ScrollToTop';
 import AboutUs from './pages/AboutUs';
 
+import axios from 'axios';
 import API_BASE_URL from './config';
 
 // GLOBAL AXIOS FIX: Ensure token is ALWAYS sent
