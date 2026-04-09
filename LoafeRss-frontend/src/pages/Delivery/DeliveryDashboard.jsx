@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useState, useEffect } from 'react';
 import {
     FaMotorcycle,
@@ -25,7 +26,7 @@ const DeliveryDashboard = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await fetch(`http://localhost:5001/api/delivery/orders/${rider.id}`);
+            const res = await fetch(`${API_BASE_URL}/api/delivery/orders/${rider.id}`);
             if (res.ok) {
                 const data = await res.json();
                 setOrders(data);
@@ -141,3 +142,4 @@ const DeliveryDashboard = () => {
 };
 
 export default DeliveryDashboard;
+

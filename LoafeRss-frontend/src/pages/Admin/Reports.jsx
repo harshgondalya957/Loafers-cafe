@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -25,9 +26,9 @@ const Reports = () => {
         try {
             const config = { headers: { Authorization: `Bearer ${token}` } };
             const [ordersRes, salesRes, deliveryRes] = await Promise.all([
-                axios.get(`http://localhost:5001/api/admin/reports/orders?type=${reportType}`, config),
-                axios.get(`http://localhost:5001/api/admin/reports/sales?type=${reportType}`, config),
-                axios.get(`http://localhost:5001/api/admin/reports/delivery`, config)
+                axios.get(`${API_BASE_URL}/api/admin/reports/orders?type=${reportType}`, config),
+                axios.get(`${API_BASE_URL}/api/admin/reports/sales?type=${reportType}`, config),
+                axios.get(`${API_BASE_URL}/api/admin/reports/delivery`, config)
             ]);
 
             const orders = ordersRes?.data?.reports || ordersRes?.data || [];
@@ -39,7 +40,7 @@ const Reports = () => {
             setDeliveryData(Array.isArray(delivery) ? delivery : []);
 
         } catch (err) {
-            console.error("❌ Reports error:", err?.response?.data || err.message);
+            console.error("âŒ Reports error:", err?.response?.data || err.message);
         } finally {
             setLoading(false);
         }
@@ -87,7 +88,7 @@ const Reports = () => {
                                         <YAxis stroke="#F43F97" />
                                         <Tooltip />
                                         <Legend />
-                                        <Line type="monotone" dataKey="total_revenue" stroke="#F43F97" name="Revenue (£)" strokeWidth={3} />
+                                        <Line type="monotone" dataKey="total_revenue" stroke="#F43F97" name="Revenue (Â£)" strokeWidth={3} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -115,7 +116,7 @@ const Reports = () => {
                                         <Tooltip />
                                         <Legend />
                                         <Bar yAxisId="left" dataKey="total_orders" fill="#F43F97" name="Orders" />
-                                        <Bar yAxisId="right" dataKey="total_revenue" fill="#6366F1" name="Revenue (£)" />
+                                        <Bar yAxisId="right" dataKey="total_revenue" fill="#6366F1" name="Revenue (Â£)" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -168,3 +169,4 @@ const Reports = () => {
 };
 
 export default Reports;
+

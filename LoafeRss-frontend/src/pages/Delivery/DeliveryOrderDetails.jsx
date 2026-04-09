@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -24,7 +25,7 @@ const DeliveryOrderDetails = () => {
 
     const fetchDetails = async () => {
         try {
-            const res = await fetch(`http://localhost:5001/api/delivery/order/${orderId}`);
+            const res = await fetch(`${API_BASE_URL}/api/delivery/order/${orderId}`);
             if (res.ok) setOrder(await res.json());
         } catch (error) {
             console.error(error);
@@ -35,7 +36,7 @@ const DeliveryOrderDetails = () => {
 
     const updateStatus = async (status) => {
         try {
-            const res = await fetch(`http://localhost:5001/api/delivery/order/${orderId}/status`, {
+            const res = await fetch(`${API_BASE_URL}/api/delivery/order/${orderId}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -125,13 +126,13 @@ const DeliveryOrderDetails = () => {
                                     </span>
                                     <span className="font-bold text-gray-700 text-sm">{item.item_name}</span>
                                 </div>
-                                <span className="text-gray-400 font-medium text-sm">£{(item.price || 0).toFixed(2)}</span>
+                                <span className="text-gray-400 font-medium text-sm">Â£{(item.price || 0).toFixed(2)}</span>
                             </li>
                         ))}
                     </ul>
                     <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                         <span className="font-bold text-gray-500">Total</span>
-                        <span className="text-xl font-bold text-primary">£{order.total_amount?.toFixed(2)}</span>
+                        <span className="text-xl font-bold text-primary">Â£{order.total_amount?.toFixed(2)}</span>
                     </div>
                     <div className="mt-2 text-xs text-gray-400 flex justify-between">
                         <span className="font-bold uppercase tracking-wider">Payment</span>
@@ -179,3 +180,4 @@ const DeliveryOrderDetails = () => {
 };
 
 export default DeliveryOrderDetails;
+

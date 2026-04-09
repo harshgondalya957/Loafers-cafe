@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaUserPlus, FaTrash, FaMotorcycle } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -11,8 +12,8 @@ const Riders = () => {
     const token = localStorage.getItem("token");
 
     const fetchRiders = async () => {
-        const url = 'http://localhost:5001/api/store/riders';
-        console.log("➡️ API CALL (Riders):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/riders';
+        console.log("âž¡ï¸ API CALL (Riders):", url, { merchantId, token });
 
         try {
             const res = await fetch(url);
@@ -22,7 +23,7 @@ const Riders = () => {
                 setRiders(data || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch Riders):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch Riders):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -30,18 +31,18 @@ const Riders = () => {
 
     useEffect(() => {
         if (!merchantId) {
-            console.error("❌ merchantId missing");
+            console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("❌ token missing");
+            console.error("âŒ token missing");
         }
         fetchRiders();
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = 'http://localhost:5001/api/store/riders';
-        console.log("➡️ API CALL (Create Rider):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/riders';
+        console.log("âž¡ï¸ API CALL (Create Rider):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
@@ -56,19 +57,19 @@ const Riders = () => {
                 await fetchRiders(); // ensures latest data is retrieved immediately
             } else {
                 const errData = await res.json();
-                console.error("❌ ERROR IN PAGE (Create Rider):", errData.error || 'Failed to add rider');
+                console.error("âŒ ERROR IN PAGE (Create Rider):", errData.error || 'Failed to add rider');
                 alert(`Error: ${errData.error || 'Failed to add rider'}`);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Create Rider):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Create Rider):", error.message || error);
             alert("Network error: Could not add rider");
         }
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this rider?")) return;
-        const url = `http://localhost:5001/api/store/riders/${id}`;
-        console.log("➡️ API CALL (Delete Rider):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/riders/${id}`;
+        console.log("âž¡ï¸ API CALL (Delete Rider):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { method: 'DELETE' });
@@ -78,7 +79,7 @@ const Riders = () => {
                 fetchRiders();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete Rider):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete Rider):", error.message || error);
         }
     };
 
@@ -160,4 +161,5 @@ const Riders = () => {
 };
 
 export default Riders;
+
 

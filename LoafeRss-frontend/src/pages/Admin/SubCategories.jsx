@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -14,19 +15,19 @@ const SubCategories = () => {
 
     useEffect(() => {
         if (!merchantId) {
-            console.error("❌ merchantId missing");
+            console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("❌ token missing");
+            console.error("âŒ token missing");
         }
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const subUrl = 'http://localhost:5001/api/store/sub-categories';
-        const catUrl = 'http://localhost:5001/api/store/categories';
+        const subUrl = '${API_BASE_URL}/api/store/sub-categories';
+        const catUrl = '${API_BASE_URL}/api/store/categories';
 
-        console.log("➡️ API CALL (SubCategories/Data):", subUrl, { merchantId, token });
+        console.log("âž¡ï¸ API CALL (SubCategories/Data):", subUrl, { merchantId, token });
 
         try {
             const [subRes, catRes] = await Promise.all([
@@ -43,7 +44,7 @@ const SubCategories = () => {
                 setCategories(cats || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch SubCategories):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch SubCategories):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -52,11 +53,11 @@ const SubCategories = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = editing
-            ? `http://localhost:5001/api/store/sub-categories/${editing}`
-            : 'http://localhost:5001/api/store/sub-categories';
+            ? `${API_BASE_URL}/api/store/sub-categories/${editing}`
+            : '${API_BASE_URL}/api/store/sub-categories';
         const method = editing ? 'PUT' : 'POST';
 
-        console.log("➡️ API CALL (Submit SubCategory):", url, { merchantId, token });
+        console.log("âž¡ï¸ API CALL (Submit SubCategory):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
@@ -73,7 +74,7 @@ const SubCategories = () => {
                 fetchData();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Submit SubCategory):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Submit SubCategory):", error.message || error);
         }
     };
 
@@ -84,8 +85,8 @@ const SubCategories = () => {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this sub-category?")) return;
-        const url = `http://localhost:5001/api/store/sub-categories/${id}`;
-        console.log("➡️ API CALL (Delete SubCategory):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/sub-categories/${id}`;
+        console.log("âž¡ï¸ API CALL (Delete SubCategory):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { method: 'DELETE' });
@@ -95,7 +96,7 @@ const SubCategories = () => {
                 fetchData();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete SubCategory):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete SubCategory):", error.message || error);
         }
     };
 
@@ -187,3 +188,4 @@ const SubCategories = () => {
 };
 
 export default SubCategories;
+

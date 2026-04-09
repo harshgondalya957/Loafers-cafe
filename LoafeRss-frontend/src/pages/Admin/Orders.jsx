@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
+import API_BASE_URL from "../../config";
 import { FaTrash, FaExclamationTriangle, FaArrowRight, FaPrint } from 'react-icons/fa';
 import { useReactToPrint } from 'react-to-print';
 import { menuData } from '../../data/products';
@@ -37,7 +38,7 @@ const Orders = () => {
     }, []);
 
     const fetchOrders = async (silent = false) => {
-        const url = `http://localhost:5001/api/admin/orders`;
+        const url = `${API_BASE_URL}/api/admin/orders`;
         try {
             if (!silent) setLoading(true);
             const res = await axios.get(url, {
@@ -55,7 +56,7 @@ const Orders = () => {
 
 
     const fetchOrderDetails = async (id) => {
-        const url = `http://localhost:5001/api/admin/orders/${id}`;
+        const url = `${API_BASE_URL}/api/admin/orders/${id}`;
         console.log("➡️ API CALL (Order Details):", url, { merchantId, token });
 
         try {
@@ -76,7 +77,7 @@ const Orders = () => {
 
     const handleDeleteOrder = async (id) => {
         if (window.confirm('Are you sure you want to cancel/delete this order?')) {
-            const url = `http://localhost:5001/api/admin/orders/${id}`;
+            const url = `${API_BASE_URL}/api/admin/orders/${id}`;
             console.log("➡️ API CALL (Delete Order):", url, { merchantId, token });
 
             try {
@@ -99,7 +100,7 @@ const Orders = () => {
 
     const handleDeleteAllOrders = async () => {
         if (window.confirm('WARNING: This will delete ALL orders. Are you sure?')) {
-            const url = `http://localhost:5001/api/admin/orders/all`;
+            const url = `${API_BASE_URL}/api/admin/orders/all`;
             console.log("➡️ API CALL (Delete All Orders):", url, { merchantId, token });
 
             try {

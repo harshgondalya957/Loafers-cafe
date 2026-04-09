@@ -40,10 +40,10 @@ import DeliveryOrderDetails from './pages/Delivery/DeliveryOrderDetails';
 import ScrollToTop from './components/ScrollToTop';
 import AboutUs from './pages/AboutUs';
 
-import axios from 'axios';
+import API_BASE_URL from './config';
 
 // GLOBAL AXIOS FIX: Ensure token is ALWAYS sent
-axios.defaults.baseURL = "http://localhost:5001";
+axios.defaults.baseURL = API_BASE_URL;
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {

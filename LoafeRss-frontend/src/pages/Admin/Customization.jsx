@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit, FaTimes } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -30,10 +31,10 @@ const Customization = () => {
 
     useEffect(() => {
         if (!merchantId) {
-            console.error("❌ merchantId missing");
+            console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("❌ token missing");
+            console.error("âŒ token missing");
         }
         fetchGroups();
     }, []);
@@ -47,8 +48,8 @@ const Customization = () => {
     }, [selectedGroup]);
 
     const fetchGroups = async () => {
-        const url = 'http://localhost:5001/api/store/customization-groups';
-        console.log("➡️ API CALL (Customization Groups):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/customization-groups';
+        console.log("âž¡ï¸ API CALL (Customization Groups):", url, { merchantId, token });
 
         try {
             const res = await fetch(url);
@@ -58,15 +59,15 @@ const Customization = () => {
                 setGroups(data || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch Groups):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch Groups):", error.message || error);
         } finally {
             setLoading(false);
         }
     };
 
     const fetchGroupItems = async (groupId) => {
-        const url = `http://localhost:5001/api/store/customization-groups/${groupId}/items`;
-        console.log("➡️ API CALL (Group Items):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/customization-groups/${groupId}/items`;
+        console.log("âž¡ï¸ API CALL (Group Items):", url, { merchantId, token });
 
         try {
             const res = await fetch(url);
@@ -76,15 +77,15 @@ const Customization = () => {
                 setGroupItems(data || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch Group Items):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch Group Items):", error.message || error);
         }
     };
 
     // --- Group Actions ---
     const handleGroupSubmit = async (e) => {
         e.preventDefault();
-        const url = 'http://localhost:5001/api/store/customization-groups';
-        console.log("➡️ API CALL (Create Group):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/customization-groups';
+        console.log("âž¡ï¸ API CALL (Create Group):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
@@ -99,14 +100,14 @@ const Customization = () => {
                 fetchGroups();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Create Group):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Create Group):", error.message || error);
         }
     };
 
     const handleDeleteGroup = async (id) => {
         if (!window.confirm("Are you sure? This will delete the group and all its items.")) return;
-        const url = `http://localhost:5001/api/store/customization-groups/${id}`;
-        console.log("➡️ API CALL (Delete Group):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/customization-groups/${id}`;
+        console.log("âž¡ï¸ API CALL (Delete Group):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { method: 'DELETE' });
@@ -117,7 +118,7 @@ const Customization = () => {
                 if (selectedGroup && selectedGroup.id === id) setSelectedGroup(null);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete Group):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete Group):", error.message || error);
         }
     };
 
@@ -125,8 +126,8 @@ const Customization = () => {
     const handleItemSubmit = async (e) => {
         e.preventDefault();
         if (!selectedGroup) return;
-        const url = `http://localhost:5001/api/store/customization-groups/${selectedGroup.id}/items`;
-        console.log("➡️ API CALL (Create Item):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/customization-groups/${selectedGroup.id}/items`;
+        console.log("âž¡ï¸ API CALL (Create Item):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
@@ -142,14 +143,14 @@ const Customization = () => {
                 fetchGroupItems(selectedGroup.id);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Create Item):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Create Item):", error.message || error);
         }
     };
 
     const handleDeleteItem = async (itemId) => {
         if (!window.confirm("Delete this option?")) return;
-        const url = `http://localhost:5001/api/store/customization-items/${itemId}`;
-        console.log("➡️ API CALL (Delete Item):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/customization-items/${itemId}`;
+        console.log("âž¡ï¸ API CALL (Delete Item):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { method: 'DELETE' });
@@ -159,7 +160,7 @@ const Customization = () => {
                 if (selectedGroup) fetchGroupItems(selectedGroup.id);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete Item):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete Item):", error.message || error);
         }
     };
 
@@ -216,7 +217,7 @@ const Customization = () => {
                                         <div>
                                             <div className="font-bold text-base">{g.admin_name}</div>
                                             <div className={`text-xs mt-1 ${selectedGroup?.id === g.id ? 'text-pink-100' : 'text-gray-500'}`}>
-                                                {g.customer_name} • {g.is_required ? 'Req' : 'Opt'} ({g.min_selection}-{g.max_selection})
+                                                {g.customer_name} â€¢ {g.is_required ? 'Req' : 'Opt'} ({g.min_selection}-{g.max_selection})
                                             </div>
                                         </div>
                                         <button
@@ -273,7 +274,7 @@ const Customization = () => {
                             <div className="flex-1 overflow-y-auto p-6">
                                 {groupItems.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                                        <span className="text-4xl mb-2">🥗</span>
+                                        <span className="text-4xl mb-2">ðŸ¥—</span>
                                         <p className="font-bold">No options added yet.</p>
                                     </div>
                                 ) : (
@@ -291,7 +292,7 @@ const Customization = () => {
                                                 <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
                                                     <td className="py-3 pl-2 font-bold text-gray-700">{item.name}</td>
                                                     <td className="py-3 text-right font-bold text-primary">
-                                                        {item.price > 0 ? `+£${parseFloat(item.price).toFixed(2)}` : 'Free'}
+                                                        {item.price > 0 ? `+Â£${parseFloat(item.price).toFixed(2)}` : 'Free'}
                                                     </td>
                                                     <td className="py-3 text-right text-gray-500 font-medium text-sm">
                                                         {item.calories ? `${item.calories} kcal` : '-'}
@@ -313,7 +314,7 @@ const Customization = () => {
                         </>
                     ) : (
                         <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50/30">
-                            <span className="text-4xl mb-4 text-gray-300">👈</span>
+                            <span className="text-4xl mb-4 text-gray-300">ðŸ‘ˆ</span>
                             <p className="font-bold text-lg text-gray-500">Select a group to manage options</p>
                         </div>
                     )}
@@ -324,3 +325,4 @@ const Customization = () => {
 };
 
 export default Customization;
+

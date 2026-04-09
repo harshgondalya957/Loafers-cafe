@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import API_BASE_URL from '../config';
 import { FaArrowLeft, FaMapMarkerAlt, FaPhone, FaCreditCard, FaMoneyBillWave, FaCheckCircle, FaStore, FaMotorcycle, FaWalking, FaTags, FaChevronRight, FaEnvelope } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -34,7 +35,7 @@ const Checkout = () => {
         // Fetch Store Settings Time Boundaries
         const fetchSettings = async () => {
             try {
-                const res = await fetch('http://localhost:5001/api/store/settings');
+                const res = await fetch(`${API_BASE_URL}/api/store/settings`);
                 if (res.ok) {
                     const data = await res.json();
                     setStoreSettings(data);
@@ -128,7 +129,7 @@ const Checkout = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:5001/api/payment/place-order', {
+            const response = await fetch(`${API_BASE_URL}/api/payment/place-order`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

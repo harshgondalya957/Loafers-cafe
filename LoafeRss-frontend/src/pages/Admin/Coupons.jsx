@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaTag, FaTrash, FaPlus } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -12,17 +13,17 @@ const Coupons = () => {
 
     useEffect(() => {
         if (!merchantId) {
-            console.error("❌ merchantId missing");
+            console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("❌ token missing");
+            console.error("âŒ token missing");
         }
         fetchCoupons();
     }, []);
 
     const fetchCoupons = async () => {
-        const url = 'http://localhost:5001/api/store/coupons';
-        console.log("➡️ API CALL (Coupons):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/coupons';
+        console.log("âž¡ï¸ API CALL (Coupons):", url, { merchantId, token });
 
         try {
             const res = await fetch(url);
@@ -32,7 +33,7 @@ const Coupons = () => {
                 setCoupons(data || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch Coupons):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch Coupons):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -40,8 +41,8 @@ const Coupons = () => {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this coupon?")) return;
-        const url = `http://localhost:5001/api/store/coupons/${id}`;
-        console.log("➡️ API CALL (Delete Coupon):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/coupons/${id}`;
+        console.log("âž¡ï¸ API CALL (Delete Coupon):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { method: 'DELETE' });
@@ -51,14 +52,14 @@ const Coupons = () => {
                 fetchCoupons();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete Coupon):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete Coupon):", error.message || error);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = 'http://localhost:5001/api/store/coupons';
-        console.log("➡️ API CALL (Create Coupon):", url, { merchantId, token });
+        const url = '${API_BASE_URL}/api/store/coupons';
+        console.log("âž¡ï¸ API CALL (Create Coupon):", url, { merchantId, token });
 
         try {
             const payload = { ...form };
@@ -76,11 +77,11 @@ const Coupons = () => {
                 fetchCoupons();
             } else {
                 const errorData = await res.json();
-                console.error("❌ ERROR IN PAGE (Create Coupon):", errorData.error || 'Unknown error');
+                console.error("âŒ ERROR IN PAGE (Create Coupon):", errorData.error || 'Unknown error');
                 alert(`Failed to create coupon: ${errorData.error || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Create Coupon):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Create Coupon):", error.message || error);
             alert("Error connecting to server to create coupon.");
         }
     };
@@ -100,7 +101,7 @@ const Coupons = () => {
                                     <div>
                                         <span className="font-bold text-lg text-primary block tracking-wider">{c.code}</span>
                                         <span className="text-sm font-bold text-gray-500">
-                                            {c.type === 'bogo' ? 'Buy One Get One' : c.type === 'percentage' ? `${c.value}% Off` : `£${c.value} Off`}
+                                            {c.type === 'bogo' ? 'Buy One Get One' : c.type === 'percentage' ? `${c.value}% Off` : `Â£${c.value} Off`}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -136,7 +137,7 @@ const Coupons = () => {
                         <div>
                             <label className="block text-sm font-bold text-gray-600 mb-2">Coupon Type</label>
                             <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold">
-                                <option value="amount">Fixed Amount (£)</option>
+                                <option value="amount">Fixed Amount (Â£)</option>
                                 <option value="percentage">Percentage (%)</option>
                                 <option value="bogo">Buy One Get One Free</option>
                             </select>
@@ -162,4 +163,5 @@ const Coupons = () => {
 };
 
 export default Coupons;
+
 

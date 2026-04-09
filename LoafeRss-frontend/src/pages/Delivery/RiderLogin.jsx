@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { FaMotorcycle, FaCheck, FaPhone, FaArrowRight } from 'react-icons/fa';
@@ -24,7 +25,7 @@ const RiderLogin = () => {
 
     const fetchRiders = async () => {
         try {
-            const res = await fetch('http://localhost:5001/api/store/riders');
+            const res = await fetch('${API_BASE_URL}/api/store/riders');
             if (res.ok) {
                 const data = await res.json();
                 setRiders(data.filter(r => r.status === 'available' || r.status === 'busy'));
@@ -88,3 +89,4 @@ const RiderLogin = () => {
 };
 
 export default RiderLogin;
+

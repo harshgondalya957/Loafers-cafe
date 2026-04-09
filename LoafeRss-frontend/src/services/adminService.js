@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:5001/api/admin';
+import API_BASE_URL from '../config';
+const API_URL = `${API_BASE_URL}/api/admin`;
 
 export const createStore = async (storeData) => {
     try {

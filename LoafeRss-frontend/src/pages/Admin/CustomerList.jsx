@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -22,7 +23,7 @@ const CustomerList = () => {
     }, [filterType, filterValue, customers]);
 
     const fetchCustomers = async () => {
-        const url = `http://localhost:5001/api/admin/customers`;
+        const url = `${API_BASE_URL}/api/admin/customers`;
         try {
             const config = { headers: { Authorization: `Bearer ${token}` } };
             const res = await axios.get(url, config);
@@ -35,7 +36,7 @@ const CustomerList = () => {
             setCustomers(sorted);
             setFilteredCustomers(sorted);
         } catch (error) {
-            console.error("❌ ERROR (Fetch Customers):", error.message || error);
+            console.error("âŒ ERROR (Fetch Customers):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -181,4 +182,5 @@ const CustomerList = () => {
 };
 
 export default CustomerList;
+
 

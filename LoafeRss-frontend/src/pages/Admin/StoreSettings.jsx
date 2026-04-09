@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { FaClock, FaToggleOn, FaToggleOff, FaPrint, FaTicketAlt } from 'react-icons/fa';
@@ -28,8 +29,8 @@ const StoreSettings = () => {
     }, []); 
 
     const fetchSettings = async () => {
-        const url = 'http://localhost:5001/api/store/settings';
-        console.log("➡️ API CALL (Store Settings):", url, { token });
+        const url = '${API_BASE_URL}/api/store/settings';
+        console.log("âž¡ï¸ API CALL (Store Settings):", url, { token });
 
         try {
             const res = await axios.get(url, {
@@ -39,14 +40,14 @@ const StoreSettings = () => {
             const settingsData = res.data?.settings || res.data?.data || res.data;
             if (settingsData && settingsData.open_time) setSettings(settingsData);
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Fetch Settings):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Fetch Settings):", error.message || error);
         } finally {
             setLoading(false);
         }
     };
 
     const handleSave = async () => {
-        const url = 'http://localhost:5001/api/store/settings';
+        const url = '${API_BASE_URL}/api/store/settings';
         try {
             const res = await axios.put(url, settings, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -54,7 +55,7 @@ const StoreSettings = () => {
             debugLog("UPDATE SETTINGS RESPONSE", res.data);
             alert("Settings Updated!");
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Update Settings):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Update Settings):", error.message || error);
         }
     };
 
@@ -182,3 +183,4 @@ const StoreSettings = () => {
 };
 
 export default StoreSettings;
+

@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit, FaEye, FaEyeSlash, FaImage } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -20,21 +21,21 @@ const Items = () => {
 
     useEffect(() => {
         if (!merchantId) {
-            console.error("❌ merchantId missing");
+            console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("❌ token missing");
+            console.error("âŒ token missing");
         }
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const itemsUrl = 'http://localhost:5001/api/store/items';
-        const catUrl = 'http://localhost:5001/api/store/categories';
-        const subUrl = 'http://localhost:5001/api/store/sub-categories';
-        const groupUrl = 'http://localhost:5001/api/store/customization-groups';
+        const itemsUrl = '${API_BASE_URL}/api/store/items';
+        const catUrl = '${API_BASE_URL}/api/store/categories';
+        const subUrl = '${API_BASE_URL}/api/store/sub-categories';
+        const groupUrl = '${API_BASE_URL}/api/store/customization-groups';
 
-        console.log("➡️ API CALL (Items/Data):", itemsUrl, { merchantId, token });
+        console.log("âž¡ï¸ API CALL (Items/Data):", itemsUrl, { merchantId, token });
 
         try {
             const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -66,7 +67,7 @@ const Items = () => {
                 setCustomGroups(groupData || []);
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Items/Data):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Items/Data):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -84,11 +85,11 @@ const Items = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = editing
-            ? `http://localhost:5001/api/store/items/${editing}`
-            : 'http://localhost:5001/api/store/items';
+            ? `${API_BASE_URL}/api/store/items/${editing}`
+            : '${API_BASE_URL}/api/store/items';
         const method = editing ? 'PUT' : 'POST';
 
-        console.log("➡️ API CALL (Submit Item):", url, { merchantId, token });
+        console.log("âž¡ï¸ API CALL (Submit Item):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
@@ -112,13 +113,13 @@ const Items = () => {
                 fetchData();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Submit Item):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Submit Item):", error.message || error);
         }
     };
 
     const handleToggleStatus = async (item) => {
-        const url = `http://localhost:5001/api/store/items/${item._id}/status`;
-        console.log("➡️ API CALL (Toggle Status):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/items/${item._id}/status`;
+        console.log("âž¡ï¸ API CALL (Toggle Status):", url, { merchantId, token });
 
         try {
             const newStatus = item.is_active ? 0 : 1;
@@ -136,14 +137,14 @@ const Items = () => {
                 fetchData();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Toggle Status):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Toggle Status):", error.message || error);
         }
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
-        const url = `http://localhost:5001/api/store/items/${id}`;
-        console.log("➡️ API CALL (Delete Item):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/items/${id}`;
+        console.log("âž¡ï¸ API CALL (Delete Item):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, { 
@@ -156,7 +157,7 @@ const Items = () => {
                 fetchData();
             }
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Delete Item):", error.message || error);
+            console.error("âŒ ERROR IN PAGE (Delete Item):", error.message || error);
         }
     };
 
@@ -186,7 +187,7 @@ const Items = () => {
                                 {items.map(item => (
                                     <tr key={item._id} className="hover:bg-primary/5 hover:scale-[1.005] transition-all duration-200 cursor-pointer bg-white">
                                         <td className="p-4 font-bold text-gray-800">{item.name}</td>
-                                        <td className="p-4 font-bold text-primary">£{item.price}</td>
+                                        <td className="p-4 font-bold text-primary">Â£{item.price}</td>
                                         <td className="p-4 text-sm text-gray-500">
                                             {categories.find(c => c._id === item.category_id)?.name || '-'}
                                         </td>
@@ -226,7 +227,7 @@ const Items = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-600 mb-2">Price (£)</label>
+                                <label className="block text-sm font-bold text-gray-600 mb-2">Price (Â£)</label>
                                 <input type="number" step="0.01" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" />
                             </div>
                             <div>
@@ -303,3 +304,4 @@ const Items = () => {
 };
 
 export default Items;
+

@@ -1,3 +1,4 @@
+﻿import API_BASE_URL from './config';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCreditCard, FaLock, FaUser, FaPhone, FaMapMarkerAlt, FaShoppingBag, FaTruck, FaEnvelope, FaMoneyBillWave, FaCheckCircle, FaStore } from 'react-icons/fa';
@@ -87,7 +88,7 @@ const PaymentPage = () => {
                 paymentMethod: paymentMethod === 'card' ? 'CARD' : 'COD'
             };
 
-            const backendRes = await fetch('http://localhost:5001/api/payment/place-order', {
+            const backendRes = await fetch('${API_BASE_URL}/api/payment/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -282,7 +283,7 @@ const PaymentPage = () => {
                                     </>
                                 ) : (
                                     <>
-                                        Complete Order <span className="text-pink-200">|</span> £{finalTotal.toFixed(2)}
+                                        Complete Order <span className="text-pink-200">|</span> Â£{finalTotal.toFixed(2)}
                                     </>
                                 )}
                             </button>
@@ -308,7 +309,7 @@ const PaymentPage = () => {
                                                 <p className="font-bold text-gray-800 leading-tight">{item.name}</p>
                                             </div>
                                         </div>
-                                        <span className="font-bold text-gray-900 whitespace-nowrap">£{(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="font-bold text-gray-900 whitespace-nowrap">Â£{(item.price * item.quantity).toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -316,16 +317,16 @@ const PaymentPage = () => {
                             <div className="mt-6 pt-6 border-t border-dashed border-gray-200 space-y-3">
                                 <div className="flex justify-between text-sm text-gray-500">
                                     <span>Subtotal</span>
-                                    <span className="font-medium text-gray-800">£{subtotal.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-800">Â£{subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-500">
                                     <span>Tax (5%)</span>
-                                    <span className="font-medium text-gray-800">£{tax.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-800">Â£{tax.toFixed(2)}</span>
                                 </div>
                                 {customer.serviceType === 'delivery' && (
                                     <div className="flex justify-between text-sm text-gray-500">
                                         <span>Delivery Fee</span>
-                                        <span className="font-medium text-gray-800">£{deliveryFee.toFixed(2)}</span>
+                                        <span className="font-medium text-gray-800">Â£{deliveryFee.toFixed(2)}</span>
                                     </div>
                                 )}
                             </div>
@@ -333,7 +334,7 @@ const PaymentPage = () => {
                             <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between items-end">
                                 <div>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Due</p>
-                                    <p className="text-4xl font-heading font-bold text-primary">£{finalTotal.toFixed(2)}</p>
+                                    <p className="text-4xl font-heading font-bold text-primary">Â£{finalTotal.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -346,3 +347,4 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+

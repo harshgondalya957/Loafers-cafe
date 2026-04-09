@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import API_BASE_URL from '../config';
 import { FaStar, FaInfoCircle, FaSearch, FaPlus, FaCheckCircle, FaTimesCircle, FaRegCheckCircle, FaMapMarkerAlt, FaGoogle } from 'react-icons/fa';
 import { FiClock, FiShoppingBag, FiUsers } from 'react-icons/fi';
 import { MdDeliveryDining, MdStorefront, MdKeyboardArrowDown } from 'react-icons/md';
@@ -186,7 +187,7 @@ const OrderNow = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const res = await fetch('http://localhost:5001/api/store/settings');
+                const res = await fetch(`${API_BASE_URL}/api/store/settings`);
                 if (res.ok) {
                     const data = await res.json();
                     setStoreSettings(data);
@@ -253,7 +254,7 @@ const OrderNow = () => {
                             onClick={async () => {
                                 try {
                                     const result = await googleLogin();
-                                    await fetch('http://localhost:5001/api/shop/sync-user', {
+                                    await fetch(`${API_BASE_URL}/api/shop/sync-user`, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({

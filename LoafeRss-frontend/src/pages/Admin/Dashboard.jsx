@@ -1,4 +1,5 @@
-import axios from 'axios';
+﻿import axios from 'axios';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState, useRef } from 'react';
 import { FaChartBar, FaShoppingCart, FaRupeeSign, FaUsers, FaArrowRight, FaBoxOpen, FaClipboardCheck, FaMotorcycle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -43,12 +44,12 @@ const Dashboard = () => {
     }, []); // FIXED: MUST BE EMPTY
 
     const fetchDashboardData = async (silent = false) => {
-        const ordersUrl = `http://localhost:5001/api/admin/reports/orders?type=date`;
-        const activeUrl = `http://localhost:5001/api/store/orders/active`;
-        const customersUrl = `http://localhost:5001/api/admin/customers`;
-        const ridersUrl = `http://localhost:5001/api/store/riders`;
+        const ordersUrl = `${API_BASE_URL}/api/admin/reports/orders?type=date`;
+        const activeUrl = `${API_BASE_URL}/api/store/orders/active`;
+        const customersUrl = `${API_BASE_URL}/api/admin/customers`;
+        const ridersUrl = `${API_BASE_URL}/api/store/riders`;
 
-        if (!silent) console.log("➡️ API CALL (Dashboard):", ordersUrl);
+        if (!silent) console.log("âž¡ï¸ API CALL (Dashboard):", ordersUrl);
 
         try {
             const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -80,14 +81,14 @@ const Dashboard = () => {
             });
             setRecentOrders((Array.isArray(active) ? active : []).slice(0, 10) || []); 
         } catch (error) {
-            console.error("❌ FETCH ERROR (Internal):", error?.response?.data || error.message);
+            console.error("âŒ FETCH ERROR (Internal):", error?.response?.data || error.message);
         } finally {
             setLoading(false);
         }
     };
 
     const updateStatus = async (id, status) => {
-        const url = `http://localhost:5001/api/store/orders/${id}/status`;
+        const url = `${API_BASE_URL}/api/store/orders/${id}/status`;
         try {
             const response = await axios.put(url, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -95,12 +96,12 @@ const Dashboard = () => {
             debugLog("UPDATE STATUS RESPONSE", response.data);
             fetchDashboardData(true);
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Update Status):", error?.response?.data || error.message);
+            console.error("âŒ ERROR IN PAGE (Update Status):", error?.response?.data || error.message);
         }
     };
 
     const assignRider = async (orderId, riderId) => {
-        const url = `http://localhost:5001/api/store/orders/${orderId}/status`;
+        const url = `${API_BASE_URL}/api/store/orders/${orderId}/status`;
         try {
             const order = (recentOrders || []).find(o => (o.id || o._id) === orderId);
             const currentStatus = order ? order.status : 'pending';
@@ -114,7 +115,7 @@ const Dashboard = () => {
             debugLog("ASSIGN RIDER RESPONSE", response.data);
             fetchDashboardData(true);
         } catch (error) {
-            console.error("❌ ERROR IN PAGE (Assign Rider):", error?.response?.data || error.message);
+            console.error("âŒ ERROR IN PAGE (Assign Rider):", error?.response?.data || error.message);
         }
     };
 
@@ -147,7 +148,7 @@ const Dashboard = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-pink-50 flex items-center justify-between hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div>
                         <p className="text-gray-500 text-sm font-bold uppercase tracking-wider">Today's Revenue</p>
-                        <h3 className="text-3xl font-bold text-gray-800 mt-1">£{(stats.totalRevenue || 0).toFixed(2)}</h3>
+                        <h3 className="text-3xl font-bold text-gray-800 mt-1">Â£{(stats.totalRevenue || 0).toFixed(2)}</h3>
                     </div>
                     <div className="bg-green-100 p-4 rounded-full text-green-600">
                         <FaRupeeSign size={24} />
@@ -199,7 +200,7 @@ const Dashboard = () => {
                                             {order.order_type || 'Delivery'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 font-bold text-primary">£{(Number(order.total_amount) || 0).toFixed(2)}</td>
+                                    <td className="px-6 py-4 font-bold text-primary">Â£{(Number(order.total_amount) || 0).toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         {/* Rider Dropdown */}
                                         <div className="flex items-center gap-2">
@@ -256,3 +257,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
