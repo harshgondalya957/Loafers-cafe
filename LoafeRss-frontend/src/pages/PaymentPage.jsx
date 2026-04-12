@@ -4,7 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCreditCard, FaLock, FaUser, FaPhone, FaMapMarkerAlt, FaShoppingBag, FaTruck, FaEnvelope, FaMoneyBillWave, FaCheckCircle, FaStore } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-// Removed cloverService since backend handles it directly
+// Removed cloverService since b
+// ackend handles it directly
 import { useLocationContext } from '../context/LocationContext';
 
 const PaymentPage = () => {
@@ -96,12 +97,12 @@ const PaymentPage = () => {
 
             if (backendRes.ok) {
                 const data = await backendRes.json();
-                localStorage.removeItem('cartItems'); 
-                navigate('/payment-success', { 
-                    state: { 
+                localStorage.removeItem('cartItems');
+                navigate('/payment-success', {
+                    state: {
                         orderId: data.order?._id || data.id || 'Success',
                         tokenNumber: data.order?.tokenNumber || data.tokenNumber || data.order?.token_number
-                    } 
+                    }
                 });
             } else {
                 const errorData = await backendRes.json();
