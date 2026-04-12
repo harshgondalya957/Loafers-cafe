@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from './config';
+import API_BASE_URL from './config';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCreditCard, FaLock, FaUser, FaPhone, FaMapMarkerAlt, FaShoppingBag, FaTruck, FaEnvelope, FaMoneyBillWave, FaCheckCircle, FaStore } from 'react-icons/fa';
@@ -88,7 +88,7 @@ const PaymentPage = () => {
                 paymentMethod: paymentMethod === 'card' ? 'CARD' : 'COD'
             };
 
-            const backendRes = await fetch('${API_BASE_URL}/api/payment/place-order', {
+            const backendRes = await fetch(`${API_BASE_URL}/api/payment/place-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

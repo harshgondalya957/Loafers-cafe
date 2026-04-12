@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -18,16 +18,16 @@ const SubCategories = () => {
             console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("âŒ token missing");
+            console.error("â Œ token missing");
         }
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const subUrl = '${API_BASE_URL}/api/store/sub-categories';
-        const catUrl = '${API_BASE_URL}/api/store/categories';
+        const subUrl = `${API_BASE_URL}/api/store/sub-categories`;
+        const catUrl = `${API_BASE_URL}/api/store/categories`;
 
-        console.log("âž¡ï¸ API CALL (SubCategories/Data):", subUrl, { merchantId, token });
+        console.log("âž¡ï¸  API CALL (SubCategories/Data):", subUrl, { merchantId, token });
 
         try {
             const [subRes, catRes] = await Promise.all([
@@ -54,7 +54,7 @@ const SubCategories = () => {
         e.preventDefault();
         const url = editing
             ? `${API_BASE_URL}/api/store/sub-categories/${editing}`
-            : '${API_BASE_URL}/api/store/sub-categories';
+            : `${API_BASE_URL}/api/store/sub-categories`;
         const method = editing ? 'PUT' : 'POST';
 
         console.log("âž¡ï¸ API CALL (Submit SubCategory):", url, { merchantId, token });

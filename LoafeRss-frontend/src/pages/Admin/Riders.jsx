@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaUserPlus, FaTrash, FaMotorcycle } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -12,7 +12,7 @@ const Riders = () => {
     const token = localStorage.getItem("token");
 
     const fetchRiders = async () => {
-        const url = '${API_BASE_URL}/api/store/riders';
+        const url = `${API_BASE_URL}/api/store/riders`;
         console.log("âž¡ï¸ API CALL (Riders):", url, { merchantId, token });
 
         try {
@@ -41,7 +41,7 @@ const Riders = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = '${API_BASE_URL}/api/store/riders';
+        const url = `${API_BASE_URL}/api/store/riders`;
         console.log("âž¡ï¸ API CALL (Create Rider):", url, { merchantId, token });
 
         try {

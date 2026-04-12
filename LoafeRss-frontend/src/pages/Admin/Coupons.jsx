@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaTag, FaTrash, FaPlus } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -22,7 +22,7 @@ const Coupons = () => {
     }, []);
 
     const fetchCoupons = async () => {
-        const url = '${API_BASE_URL}/api/store/coupons';
+        const url = `${API_BASE_URL}/api/store/coupons`;
         console.log("âž¡ï¸ API CALL (Coupons):", url, { merchantId, token });
 
         try {
@@ -58,7 +58,7 @@ const Coupons = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = '${API_BASE_URL}/api/store/coupons';
+        const url = `${API_BASE_URL}/api/store/coupons`;
         console.log("âž¡ï¸ API CALL (Create Coupon):", url, { merchantId, token });
 
         try {

@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit, FaEye, FaEyeSlash, FaImage } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -30,10 +30,10 @@ const Items = () => {
     }, []);
 
     const fetchData = async () => {
-        const itemsUrl = '${API_BASE_URL}/api/store/items';
-        const catUrl = '${API_BASE_URL}/api/store/categories';
-        const subUrl = '${API_BASE_URL}/api/store/sub-categories';
-        const groupUrl = '${API_BASE_URL}/api/store/customization-groups';
+        const itemsUrl = `${API_BASE_URL}/api/store/items`;
+        const catUrl = `${API_BASE_URL}/api/store/categories`;
+        const subUrl = `${API_BASE_URL}/api/store/sub-categories`;
+        const groupUrl = `${API_BASE_URL}/api/store/customization-groups`;
 
         console.log("âž¡ï¸ API CALL (Items/Data):", itemsUrl, { merchantId, token });
 
@@ -86,7 +86,7 @@ const Items = () => {
         e.preventDefault();
         const url = editing
             ? `${API_BASE_URL}/api/store/items/${editing}`
-            : '${API_BASE_URL}/api/store/items';
+            : `${API_BASE_URL}/api/store/items`;
         const method = editing ? 'PUT' : 'POST';
 
         console.log("âž¡ï¸ API CALL (Submit Item):", url, { merchantId, token });

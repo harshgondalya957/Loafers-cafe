@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit, FaTimes } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -48,7 +48,7 @@ const Customization = () => {
     }, [selectedGroup]);
 
     const fetchGroups = async () => {
-        const url = '${API_BASE_URL}/api/store/customization-groups';
+        const url = `${API_BASE_URL}/api/store/customization-groups`;
         console.log("âž¡ï¸ API CALL (Customization Groups):", url, { merchantId, token });
 
         try {
@@ -84,7 +84,7 @@ const Customization = () => {
     // --- Group Actions ---
     const handleGroupSubmit = async (e) => {
         e.preventDefault();
-        const url = '${API_BASE_URL}/api/store/customization-groups';
+        const url = `${API_BASE_URL}/api/store/customization-groups`;
         console.log("âž¡ï¸ API CALL (Create Group):", url, { merchantId, token });
 
         try {

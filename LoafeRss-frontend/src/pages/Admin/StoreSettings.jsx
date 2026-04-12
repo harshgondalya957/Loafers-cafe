@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { FaClock, FaToggleOn, FaToggleOff, FaPrint, FaTicketAlt } from 'react-icons/fa';
@@ -29,7 +29,7 @@ const StoreSettings = () => {
     }, []); 
 
     const fetchSettings = async () => {
-        const url = '${API_BASE_URL}/api/store/settings';
+        const url = `${API_BASE_URL}/api/store/settings`;
         console.log("âž¡ï¸ API CALL (Store Settings):", url, { token });
 
         try {
@@ -47,7 +47,7 @@ const StoreSettings = () => {
     };
 
     const handleSave = async () => {
-        const url = '${API_BASE_URL}/api/store/settings';
+        const url = `${API_BASE_URL}/api/store/settings`;
         try {
             const res = await axios.put(url, settings, {
                 headers: { Authorization: `Bearer ${token}` }

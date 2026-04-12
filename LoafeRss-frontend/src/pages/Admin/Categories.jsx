@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaEdit } from 'react-icons/fa';
 import { debugLog } from '../../utils/debug';
@@ -17,14 +17,14 @@ const Categories = () => {
             console.error("âŒ merchantId missing");
         }
         if (!token) {
-            console.error("âŒ token missing");
+            console.error("â Œ token missing");
         }
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const url = '${API_BASE_URL}/api/store/categories';
-        console.log("âž¡ï¸ API CALL (Categories):", url, { merchantId, token });
+        const url = `${API_BASE_URL}/api/store/categories`;
+        console.log("âž¡ï¸  API CALL (Categories):", url, { merchantId, token });
 
         try {
             const res = await fetch(url);
@@ -34,7 +34,7 @@ const Categories = () => {
                 setCategories(data || []);
             }
         } catch (error) {
-            console.error("âŒ ERROR IN PAGE (Fetch Categories):", error.message || error);
+            console.error("â Œ ERROR IN PAGE (Fetch Categories):", error.message || error);
         } finally {
             setLoading(false);
         }
@@ -44,10 +44,10 @@ const Categories = () => {
         e.preventDefault();
         const url = editing
             ? `${API_BASE_URL}/api/store/categories/${editing}`
-            : '${API_BASE_URL}/api/store/categories';
+            : `${API_BASE_URL}/api/store/categories`;
         const method = editing ? 'PUT' : 'POST';
 
-        console.log("âž¡ï¸ API CALL (Submit Category):", url, { merchantId, token });
+        console.log("âž¡ï¸  API CALL (Submit Category):", url, { merchantId, token });
 
         try {
             const res = await fetch(url, {
