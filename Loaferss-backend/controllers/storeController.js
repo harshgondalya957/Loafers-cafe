@@ -33,16 +33,24 @@ exports.getRiders = async (req, res) => {
     try {
         let riders = await Rider.find().sort({ created_at: -1 }).lean();
 
-        // Fallback: Check if user manually created a capitalized 'Riders' collection in MongoDB Compass
+        // Fallback: Aggressively seek riders in different possible collection names (Legacy transition support)
         if (riders.length === 0) {
+            console.log("🟠 No riders found in standard 'riders' collection. Checking manual fallbacks...");
             try {
                 const mongoose = require('mongoose');
                 const db = mongoose.connection.db;
-                const manualRiders = await db.collection('Riders').find().toArray();
-                const singularRider = await db.collection('Rider').find().toArray();
-
-                if (manualRiders.length > 0) riders = manualRiders;
-                else if (singularRider.length > 0) riders = singularRider;
+                
+                // List of possible collection names used in previous versions or manual imports
+                const possibleCollections = ['Riders', 'Rider', 'rider', 'riders_list', 'staff', 'drivers'];
+                
+                for (const colName of possibleCollections) {
+                    const data = await db.collection(colName).find().toArray();
+                    if (data && data.length > 0) {
+                        console.log(`✅ Found ${data.length} riders in legacy collection: '${colName}'`);
+                        riders = data;
+                        break;
+                    }
+                }
             } catch (err) {
                 console.error("Fallback DB check error:", err);
             }
