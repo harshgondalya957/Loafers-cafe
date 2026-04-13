@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 
+// Admin Auth
+router.post('/login', adminController.adminLogin);
+
 // Store Creation
 router.post('/store', adminController.createStore);
 

@@ -4,11 +4,17 @@ import { FaChartBar, FaShoppingCart, FaList, FaTags, FaUtensils, FaUsers, FaCog,
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
+import AdminLogin from './AdminLogin';
+
 const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const auth = useAuth();
     const logout = auth?.logout || (() => console.log("No logout available"));
+
+    const [isAdminAuthenticated, setIsAdminAuthenticated] = React.useState(
+        localStorage.getItem("adminToken") === "true"
+    );
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -33,6 +39,11 @@ const AdminLayout = () => {
         return <div className="min-h-screen flex items-center justify-center bg-[#FFF5E5]">Loading Auth...</div>;
     }
 
+    if (!isAdminAuthenticated) {
+        return <AdminLogin onLogin={() => setIsAdminAuthenticated(true)} />;
+    }
+
+
     const menuItems = [
         { path: '/admin', icon: <FaChartBar />, label: 'Dashboard' },
         { path: '/admin/orders', icon: <FaShoppingCart />, label: 'Orders' },
@@ -48,8 +59,9 @@ const AdminLayout = () => {
     ];
 
     const handleLogout = () => {
-        logout();
-        navigate('/login');
+        localStorage.removeItem("adminToken");
+        setIsAdminAuthenticated(false);
+        navigate('/admin'); // Re-renders and shows login
     };
 
     return (

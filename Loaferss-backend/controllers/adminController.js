@@ -3,6 +3,23 @@ const User = require('../models/User');
 const Store = require('../models/Store');
 const axios = require('axios');
 
+exports.adminLogin = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        // Check hardcoded env variables or fallback to admin/admin123
+        const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+        const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
+
+        if (username === ADMIN_USER && password === ADMIN_PASS) {
+            return res.json({ success: true, message: "Login successful" });
+        } else {
+            return res.status(401).json({ success: false, error: "Invalid username or password" });
+        }
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+};
+
 exports.createStore = async (req, res) => {
     try {
         const { name, location } = req.body;
