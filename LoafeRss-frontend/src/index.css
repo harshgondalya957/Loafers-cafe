@@ -17,6 +17,10 @@ body {
   background-color: #fff;
 }
 
+button {
+  cursor: pointer !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
