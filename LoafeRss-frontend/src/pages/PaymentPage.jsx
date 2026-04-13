@@ -4,8 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCreditCard, FaLock, FaUser, FaPhone, FaMapMarkerAlt, FaShoppingBag, FaTruck, FaEnvelope, FaMoneyBillWave, FaCheckCircle, FaStore } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-// Removed cloverService since b
-// ackend handles it directly
+// Removed cloverService since backend handles it directly
 import { useLocationContext } from '../context/LocationContext';
 
 const PaymentPage = () => {

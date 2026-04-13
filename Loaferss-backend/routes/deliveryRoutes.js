@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const deliveryController = require('../controllers/deliveryController');
+const storeController = require('../controllers/storeController');
 
 // Rider Auth
 router.post('/login', deliveryController.loginRider);
+router.get('/riders', storeController.getRiders);
 
 // Rider Orders
 router.get('/orders/:riderId', deliveryController.getRiderOrders);

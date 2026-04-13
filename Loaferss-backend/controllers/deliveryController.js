@@ -50,3 +50,17 @@ exports.loginRider = async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 };
+
+exports.getAllRiders = async (req, res) => {
+    try {
+        const riders = await Rider.find({}).lean();
+        const formatted = riders.map(r => ({
+            ...r,
+            id: r._id,
+            status: r.status || 'available'
+        }));
+        res.json(formatted);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};

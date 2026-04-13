@@ -90,7 +90,8 @@ exports.placeOrder = async (req, res) => {
         }
 
         // Validate ASAP outside hours
-        if (!isStoreOpen && (!scheduled_time || scheduled_time === 'ASAP')) {
+        const bypassHours = process.env.BYPASS_STORE_HOURS === 'true';
+        if (!isStoreOpen && (!scheduled_time || scheduled_time === 'ASAP') && !bypassHours) {
             return res.status(400).json({ error: "Store is currently closed. You must schedule your order for later." });
         }
 
