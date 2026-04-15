@@ -68,11 +68,11 @@ const StoreSettings = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <div className="text-center">
-                <h1 className="text-7xl font-script text-primary mb-2 drop-shadow-sm">Loafers</h1>
-                <h2 className="text-2xl font-heading font-bold text-gray-500 tracking-tighter uppercase letter-spacing-widest">Store Settings</h2>
+                <h1 className="text-5xl md:text-7xl font-script text-primary mb-2 drop-shadow-sm px-4">Loafers</h1>
+                <h2 className="text-xl md:text-2xl font-heading font-bold text-gray-500 tracking-tighter uppercase letter-spacing-widest">Store Settings</h2>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50 space-y-8">
+            <div className="bg-white p-4 md:p-8 rounded-3xl shadow-xl border border-pink-50 space-y-8">
                 {/* Timings */}
                 <div>
                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">

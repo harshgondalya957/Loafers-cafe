@@ -5,12 +5,14 @@ import { FaTimes, FaPlus, FaMinus } from 'react-icons/fa';
 const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
     const [quantity, setQuantity] = useState(1);
     const [selectedOptions, setSelectedOptions] = useState([]);
+    const [note, setNote] = useState('');
 
     // Reset state when product changes or modal opens
     useEffect(() => {
         if (isOpen) {
             setQuantity(1);
             setSelectedOptions([]);
+            setNote('');
         }
     }, [isOpen, product]);
 
@@ -60,7 +62,8 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
             ...product, // Keep original product details
             quantity,
             selectedOptions: options.filter(o => selectedOptions.includes(o.id)),
-            totalPrice: totalPrice.toFixed(2)
+            totalPrice: totalPrice.toFixed(2),
+            note
         });
         onClose();
     };
@@ -147,6 +150,20 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Note Section */}
+                            <div className="mb-6">
+                                <div className="flex items-center gap-2 border-b border-gray-300 pb-1">
+                                    <span className="text-sm font-bold text-gray-700 whitespace-nowrap">NOTE:</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Write Your Note Here..."
+                                        value={note}
+                                        onChange={(e) => setNote(e.target.value)}
+                                        className="w-full bg-transparent outline-none text-sm text-gray-600 placeholder-gray-400 font-medium"
+                                    />
+                                </div>
+                            </div>
 
                             {/* Bottom Actions (Sticky on mobile if needed, but here inline) */}
                             <div className="mt-auto pt-6 border-t border-gray-200">

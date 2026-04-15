@@ -165,13 +165,13 @@ const Customization = () => {
     };
 
     return (
-        <div className="space-y-6 h-[calc(100vh-100px)] flex flex-col">
-            <h2 className="text-3xl font-heading font-bold text-primary tracking-tighter">Customization Manager</h2>
+        <div className="space-y-6 md:h-[calc(100vh-100px)] flex flex-col">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Customization Manager</h2>
 
             <div className="grid grid-cols-12 gap-6 flex-1 min-h-0">
 
                 {/* Left Column: Groups List & Create Form */}
-                <div className="col-span-12 md:col-span-5 flex flex-col gap-6 overflow-hidden">
+                <div className="col-span-12 md:col-span-5 flex flex-col gap-6 md:overflow-hidden min-h-0">
 
                     {/* Create Group Form */}
                     <div className="bg-white p-6 rounded-3xl shadow-lg border border-pink-50 flex-shrink-0">
@@ -204,7 +204,7 @@ const Customization = () => {
                     </div>
 
                     {/* Groups List (Scrollable) */}
-                    <div className="bg-white p-6 rounded-3xl shadow-lg border border-pink-50 flex-1 overflow-y-auto min-h-0">
+                    <div className="bg-white p-4 md:p-6 rounded-3xl shadow-lg border border-pink-50 flex-1 overflow-y-auto min-h-[300px] md:min-h-0">
                         <h3 className="text-lg font-bold mb-4 text-gray-800">Groups ({groups.length})</h3>
                         <ul className="space-y-2">
                             {groups.map(g => (
@@ -234,7 +234,7 @@ const Customization = () => {
                 </div>
 
                 {/* Right Column: Items Manager */}
-                <div className="col-span-12 md:col-span-7 bg-white rounded-3xl shadow-xl border border-pink-50 flex flex-col min-h-0 overflow-hidden">
+                <div className="col-span-12 md:col-span-7 bg-white rounded-3xl shadow-xl border border-pink-50 flex flex-col min-h-[400px] md:min-h-0 overflow-hidden">
                     {selectedGroup ? (
                         <>
                             {/* Group Header */}
@@ -292,7 +292,7 @@ const Customization = () => {
                                                 <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
                                                     <td className="py-3 pl-2 font-bold text-gray-700">{item.name}</td>
                                                     <td className="py-3 text-right font-bold text-primary">
-                                                        {item.price > 0 ? `+Â£${parseFloat(item.price).toFixed(2)}` : 'Free'}
+                                                        {item.price > 0 ? `+£${parseFloat(item.price).toFixed(2)}` : 'Free'}
                                                     </td>
                                                     <td className="py-3 text-right text-gray-500 font-medium text-sm">
                                                         {item.calories ? `${item.calories} kcal` : '-'}

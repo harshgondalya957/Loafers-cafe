@@ -84,11 +84,11 @@ const Riders = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Manage Delivery Riders</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Manage Delivery Riders</h2>
 
             {/* Rider List */}
-            <div className="bg-white p-6 rounded-3xl shadow-xl border border-pink-50">
+            <div className="bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-pink-50 overflow-x-auto">
                 <table className="min-w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -131,7 +131,7 @@ const Riders = () => {
             </div>
 
             {/* Create Rider Form */}
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50">
+            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-pink-50">
                 <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
                     <span className="w-2 h-8 bg-primary rounded-full"></span>
                     Add New Rider

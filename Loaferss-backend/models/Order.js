@@ -10,7 +10,8 @@ const OrderItemSchema = new mongoose.Schema({
     customizations: [{
         name: String,
         price: Number
-    }]
+    }],
+    note: { type: String }
 }, { _id: false });
 
 const OrderSchema = new mongoose.Schema({

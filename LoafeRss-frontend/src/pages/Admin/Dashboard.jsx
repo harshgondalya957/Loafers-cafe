@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import API_BASE_URL from '../../config';
 import React, { useEffect, useState, useRef } from 'react';
 import { FaChartBar, FaShoppingCart, FaRupeeSign, FaUsers, FaArrowRight, FaBoxOpen, FaClipboardCheck, FaMotorcycle } from 'react-icons/fa';
@@ -122,11 +122,11 @@ const Dashboard = () => {
     if (loading) return <div className="flex justify-center items-center h-full text-pink-500 font-bold text-xl px-10 animate-pulse">Loading Dashboard...</div>;
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Store Dashboard</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Store Dashboard</h2>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-pink-50 flex items-center justify-between hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div>
                         <p className="text-gray-500 text-sm font-bold uppercase tracking-wider">Today's Orders</p>
@@ -148,7 +148,7 @@ const Dashboard = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-pink-50 flex items-center justify-between hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div>
                         <p className="text-gray-500 text-sm font-bold uppercase tracking-wider">Today's Revenue</p>
-                        <h3 className="text-3xl font-bold text-gray-800 mt-1">Â£{(stats.totalRevenue || 0).toFixed(2)}</h3>
+                        <h3 className="text-3xl font-bold text-gray-800 mt-1">£{(stats.totalRevenue || 0).toFixed(2)}</h3>
                     </div>
                     <div className="bg-green-100 p-4 rounded-full text-green-600">
                         <FaRupeeSign size={24} />
@@ -166,7 +166,7 @@ const Dashboard = () => {
             </div>
 
             {/* Active Orders List */}
-            <div className="bg-white rounded-3xl shadow-xl border border-pink-50 p-8">
+            <div className="bg-white rounded-3xl shadow-xl border border-pink-50 p-4 md:p-8">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                         <span className="w-2 h-8 bg-primary rounded-full"></span>

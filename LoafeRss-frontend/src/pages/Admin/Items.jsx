@@ -165,12 +165,12 @@ const Items = () => {
     const filteredSubs = subCategories.filter(s => s.category_id == form.category_id);
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Manage Items</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Manage Items</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* List */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-3xl shadow-xl border border-pink-50">
+                <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-pink-50">
                     <h3 className="text-xl font-bold mb-4 text-gray-800">Item Catalogue</h3>
                     <div className="overflow-x-auto">
                         <table className="min-w-full">
@@ -187,7 +187,7 @@ const Items = () => {
                                 {items.map(item => (
                                     <tr key={item._id} className="hover:bg-primary/5 hover:scale-[1.005] transition-all duration-200 cursor-pointer bg-white">
                                         <td className="p-4 font-bold text-gray-800">{item.name}</td>
-                                        <td className="p-4 font-bold text-primary">Â£{item.price}</td>
+                                        <td className="p-4 font-bold text-primary">£{item.price}</td>
                                         <td className="p-4 text-sm text-gray-500">
                                             {categories.find(c => c._id === item.category_id)?.name || '-'}
                                         </td>
@@ -227,7 +227,7 @@ const Items = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-600 mb-2">Price (Â£)</label>
+                                <label className="block text-sm font-bold text-gray-600 mb-2">Price (£)</label>
                                 <input type="number" step="0.01" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" />
                             </div>
                             <div>

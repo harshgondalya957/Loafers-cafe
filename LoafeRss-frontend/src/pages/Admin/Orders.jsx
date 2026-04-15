@@ -123,9 +123,9 @@ const Orders = () => {
     };
 
     return (
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50 relative">
+        <div className="bg-white p-4 md:p-8 rounded-3xl shadow-xl border border-pink-50 relative">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Orders</h2>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter">Orders</h2>
 
                 <button
                     onClick={handleDeleteAllOrders}
@@ -225,7 +225,7 @@ const Orders = () => {
                                 </button>
                             </div>
 
-                            <div className="p-6 max-h-[70vh] overflow-y-auto print:max-h-none print:overflow-visible">
+                            <div className="p-4 md:p-6 max-h-[80vh] md:max-h-[70vh] overflow-y-auto print:max-h-none print:overflow-visible">
                                 {/* Customer Info */}
                                 <div className="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100 print:bg-white print:border-black">
                                     <h4 className="font-bold text-gray-700 mb-2 uppercase text-xs tracking-wider print:text-black">Customer Details</h4>
@@ -332,7 +332,7 @@ const Orders = () => {
                         </div>
                         {/* Printable Area ends */}
 
-                        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 print:hidden">
+                        <div className="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3 print:hidden">
                             <button onClick={() => setShowModal(false)} className="px-6 py-2 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-100 transition-colors">
                                 Close
                             </button>

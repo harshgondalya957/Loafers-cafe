@@ -101,8 +101,8 @@ const SubCategories = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Manage Sub-Categories</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Manage Sub-Categories</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* List */}
@@ -130,7 +130,7 @@ const SubCategories = () => {
                 </div>
 
                 {/* Form */}
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50 h-fit">
+                <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-pink-50 h-fit">
                     <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
                         <span className="w-2 h-8 bg-primary rounded-full"></span>
                         {editing ? 'Edit Sub-Category' : 'Add New Sub-Category'}

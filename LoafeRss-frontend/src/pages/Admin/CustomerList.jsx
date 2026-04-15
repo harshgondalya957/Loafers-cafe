@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -73,9 +73,9 @@ const CustomerList = () => {
     };
 
     return (
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50">
+        <div className="bg-white p-4 md:p-8 rounded-3xl shadow-xl border border-pink-50">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Customer List</h2>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter">Customer List</h2>
 
                 <button
                     onClick={downloadExcel}
@@ -86,7 +86,7 @@ const CustomerList = () => {
             </div>
 
             {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 items-end bg-cream p-6 rounded-2xl border border-pink-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 items-end bg-cream p-4 md:p-6 rounded-2xl border border-pink-100">
                 <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Filter By</label>
                     <div className="relative">

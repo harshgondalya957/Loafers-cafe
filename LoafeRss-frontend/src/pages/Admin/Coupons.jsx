@@ -87,8 +87,8 @@ const Coupons = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Manage Coupons</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Manage Coupons</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* List */}
@@ -101,7 +101,7 @@ const Coupons = () => {
                                     <div>
                                         <span className="font-bold text-lg text-primary block tracking-wider">{c.code}</span>
                                         <span className="text-sm font-bold text-gray-500">
-                                            {c.type === 'bogo' ? 'Buy One Get One' : c.type === 'percentage' ? `${c.value}% Off` : `Â£${c.value} Off`}
+                                            {c.type === 'bogo' ? 'Buy One Get One' : c.type === 'percentage' ? `${c.value}% Off` : `£${c.value} Off`}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -137,7 +137,7 @@ const Coupons = () => {
                         <div>
                             <label className="block text-sm font-bold text-gray-600 mb-2">Coupon Type</label>
                             <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold">
-                                <option value="amount">Fixed Amount (Â£)</option>
+                                <option value="amount">Fixed Amount (£)</option>
                                 <option value="percentage">Percentage (%)</option>
                                 <option value="bogo">Buy One Get One Free</option>
                             </select>

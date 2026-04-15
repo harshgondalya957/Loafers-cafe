@@ -1,4 +1,4 @@
-﻿import API_BASE_URL from '../../config';
+import API_BASE_URL from '../../config';
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -49,15 +49,15 @@ const Reports = () => {
     const COLORS = ['#F43F97', '#6366F1', '#10B981', '#F59E0B', '#EF4444'];
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-4xl font-heading font-bold text-primary tracking-tighter">Performance Reports</h2>
+        <div className="space-y-6 md:space-y-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Performance Reports</h2>
 
-            <div className="flex space-x-4 mb-8">
+            <div className="flex flex-wrap gap-3 mb-8 px-2 md:px-0">
                 {['date', 'month', 'year'].map(type => (
                     <button
                         key={type}
                         onClick={() => setReportType(type)}
-                        className={`px-6 py-2 rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-200 ${reportType === type
+                        className={`px-4 md:px-6 py-2 rounded-full font-bold uppercase tracking-wider text-xs md:text-sm transition-all duration-200 ${reportType === type
                             ? 'bg-primary text-white shadow-lg shadow-pink-200 transform -translate-y-0.5'
                             : 'bg-white text-gray-500 hover:text-primary hover:bg-white shadow-sm'
                             }`}
@@ -74,7 +74,7 @@ const Reports = () => {
             ) : (
                 <>
                     {/* Sales Performance */}
-                    <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50">
+                    <div className="bg-white p-4 md:p-8 rounded-3xl shadow-xl border border-pink-50">
                         <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
                             <span className="w-2 h-8 bg-pink-500 rounded-full"></span>
                             Sales Trends
@@ -88,7 +88,7 @@ const Reports = () => {
                                         <YAxis stroke="#F43F97" />
                                         <Tooltip />
                                         <Legend />
-                                        <Line type="monotone" dataKey="total_revenue" stroke="#F43F97" name="Revenue (Â£)" strokeWidth={3} />
+                                        <Line type="monotone" dataKey="total_revenue" stroke="#F43F97" name="Revenue (£)" strokeWidth={3} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -99,7 +99,7 @@ const Reports = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50">
+                    <div className="bg-white p-4 md:p-8 rounded-3xl shadow-xl border border-pink-50">
                         <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
                             <span className="w-2 h-8 bg-primary rounded-full"></span>
                             Order & Revenue Volume
@@ -116,7 +116,7 @@ const Reports = () => {
                                         <Tooltip />
                                         <Legend />
                                         <Bar yAxisId="left" dataKey="total_orders" fill="#F43F97" name="Orders" />
-                                        <Bar yAxisId="right" dataKey="total_revenue" fill="#6366F1" name="Revenue (Â£)" />
+                                        <Bar yAxisId="right" dataKey="total_revenue" fill="#6366F1" name="Revenue (£)" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (

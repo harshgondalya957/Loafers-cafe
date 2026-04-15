@@ -58,7 +58,14 @@ const CartSidebar = ({ cartItems, updateQuantity, removeFromCart, isOpen, onClos
                                 {/* Details */}
                                 <div className="flex-1 flex flex-col justify-between">
                                     <div className="flex justify-between items-start">
-                                        <h4 className="font-bold text-gray-800 text-sm line-clamp-1">{item.name}</h4>
+                                        <div className="flex flex-col">
+                                            <h4 className="font-bold text-gray-800 text-sm line-clamp-1">{item.name}</h4>
+                                            {item.note && (
+                                                <p className="text-[10px] text-gray-400 italic mt-0.5 line-clamp-1">
+                                                    Note: {item.note}
+                                                </p>
+                                            )}
+                                        </div>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
                                             className="text-gray-400 hover:text-red-500 transition-colors p-1"

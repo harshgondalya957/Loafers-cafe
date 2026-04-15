@@ -116,7 +116,9 @@ const Checkout = () => {
                 id: item.id || 0,
                 name: item.name,
                 price: parseFloat(item.price),
-                quantity: item.quantity
+                quantity: item.quantity,
+                note: item.note,
+                customizations: item.selectedOptions || []
             })),
             order_type: orderType,
             delivery_address: formData.address + (formData.postcode ? ', ' + formData.postcode : ''),
@@ -366,6 +368,9 @@ const Checkout = () => {
                                                 <div className="flex items-center gap-2">
                                                     <span className="bg-gray-100 text-gray-700 text-xs font-bold px-1.5 py-0.5 rounded">{item.quantity}x</span>
                                                     <span className="text-sm font-medium text-gray-800 line-clamp-1">{item.name}</span>
+                                                    {item.note && (
+                                                        <p className="text-[10px] text-gray-400 italic">Note: {item.note}</p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

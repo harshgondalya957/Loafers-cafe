@@ -23,11 +23,11 @@ const Success = () => {
                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 text-5xl animate-bounce">
                     <FaCheckCircle />
                 </div>
-                
+
                 <h1 className="text-4xl font-bold text-gray-800">Connection Successful!</h1>
-                
+
                 <p className="text-gray-600 font-medium leading-relaxed">
-                    Your Clover account has been successfully linked with Loafers app. 
+                    Your Clover account has been successfully linked with Loafers app.
                     Tokens are now synced and updated.
                 </p>
 
@@ -36,7 +36,7 @@ const Success = () => {
                     Redirecting to Dashboard...
                 </div>
 
-                <button 
+                <button
                     onClick={() => navigate('/admin/settings')}
                     className="flex items-center gap-2 bg-primary text-white font-bold px-8 py-4 rounded-2xl shadow-lg shadow-pink-100 hover:shadow-xl hover:-translate-y-1 transition-all uppercase tracking-widest text-sm"
                 >
