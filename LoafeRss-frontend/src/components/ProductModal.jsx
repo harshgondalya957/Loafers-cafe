@@ -152,15 +152,16 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
                             )}
 
                             {/* Note Section */}
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 border-b border-gray-300 pb-1">
-                                    <span className="text-sm font-bold text-gray-700 whitespace-nowrap">NOTE:</span>
-                                    <input
-                                        type="text"
-                                        placeholder="Write Your Note Here..."
+                            <div className="mt-auto pt-6">
+                                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 transition-all focus-within:ring-2 focus-within:ring-pink-100">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-1">
+                                        Special Note / Instructions
+                                    </label>
+                                    <textarea
+                                        placeholder="Write any special requests here (e.g., allergies, no onions)..."
                                         value={note}
                                         onChange={(e) => setNote(e.target.value)}
-                                        className="w-full bg-transparent outline-none text-sm text-gray-600 placeholder-gray-400 font-medium"
+                                        className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 font-medium resize-none min-h-[60px]"
                                     />
                                 </div>
                             </div>
@@ -201,13 +202,12 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
                         </div>
 
                         {/* Right Side: Image (Full height on desktop) */}
-                        <div className="w-full md:w-2/5 h-52 md:h-auto bg-white relative order-1 md:order-2 flex items-center justify-center p-4">
+                        <div className="w-full md:w-2/5 h-64 md:h-auto relative order-1 md:order-2">
                             <img
                                 src={product.image}
                                 alt={product.name}
-                                className="w-full h-full object-contain"
+                                className="w-full h-full object-cover"
                             />
-                            {/* Removed gradient overlay as we want full visibility */}
                         </div>
                     </motion.div>
                 </div>
