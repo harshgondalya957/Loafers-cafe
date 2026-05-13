@@ -2,17 +2,18 @@ const User = require('../models/User');
 const OTP = require('../models/OTP');
 const nodemailer = require('nodemailer');
 
-// --- Email Config (Optimized with Pooling) ---
+// --- Email Config (Optimized for Cloud Environments) ---
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    pool: true, // Reuse connections
-    maxConnections: 5,
-    maxMessages: 100,
+    port: 587,
+    secure: false, // use TLS
+    pool: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // Helps with some cloud hosting provider restrictions
     }
 });
 
