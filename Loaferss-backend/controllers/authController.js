@@ -4,16 +4,21 @@ const nodemailer = require('nodemailer');
 
 // --- Email Config (Optimized with Pooling) ---
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: 'gmail',
     pool: true,
-    maxConnections: 5,
+    maxConnections: 3,
     maxMessages: 100,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : ''
-    }
+    },
+    tls: {
+        rejectUnauthorized: false // Helps on some cloud platforms
+    },
+    connectionTimeout: 10000, // 10 seconds timeout
+    greetingTimeout: 10000,
+    logger: true, // Enable logging
+    debug: true   // Enable debug output
 });
 
 const sendEmail = async (to, subject, text) => {
