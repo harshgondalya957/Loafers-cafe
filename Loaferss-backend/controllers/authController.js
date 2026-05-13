@@ -13,7 +13,18 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false // Helps with some cloud hosting provider restrictions
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 5000, // 5 seconds timeout
+    greetingTimeout: 5000
+});
+
+// Verify connection configuration
+transporter.verify(function (error, success) {
+    if (error) {
+        console.error("SMTP Connection Error:", error);
+    } else {
+        console.log("SMTP Server is ready to take our messages");
     }
 });
 
