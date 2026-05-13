@@ -2,43 +2,37 @@ const User = require('../models/User');
 const OTP = require('../models/OTP');
 const nodemailer = require('nodemailer');
 
-// --- Email Transporter Configuration ---
-// Using port 465 with IPv4 forcing which is the most reliable for Gmail on Render
+// --- Email Config (Optimized with Pooling) ---
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : ''
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    family: 4 // Force IPv4
-});
-
-// Verify connection on startup
-transporter.verify((error, success) => {
-    if (error) {
-        console.error("❌ SMTP Connection Error:", error.message);
-    } else {
-        console.log("✅ SMTP Server is ready to take messages");
+        pass: process.env.EMAIL_PASS
     }
 });
 
-const sendEmail = async (to, subject, html) => {
+const sendEmail = async (to, subject, text) => {
+    console.log("Attempting to send email to:", to);
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("EMAIL CONFIG MISSING: EMAIL_USER or EMAIL_PASS not set");
+        throw new Error("Email configuration is missing on server environment variables");
+    }
+    
+    // Debug log for Render (will show in Render logs)
+    console.log(`Using Email User: ${process.env.EMAIL_USER}`);
+    console.log(`Email Pass Length: ${process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0} chars`);
+    
     try {
         await transporter.sendMail({
             from: `"Loafers" <${process.env.EMAIL_USER}>`,
             to,
             subject,
-            html
+            html: text
         });
-        console.log(`📧 OTP Email sent successfully to: ${to}`);
+        console.log(`Email sent to ${to}`);
         return true;
     } catch (error) {
-        console.error("❌ Nodemailer Error:", error.message);
+        console.error("Email error:", error);
         throw error;
     }
 };
@@ -48,40 +42,40 @@ exports.sendOtp = async (req, res) => {
         const { email } = req.body;
         if (!email) return res.status(400).json({ error: "Email is required" });
 
-        // Generate 6-digit random OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Save OTP to DB (with 10-minute expiry handled by model)
-        await OTP.findOneAndUpdate(
-            { email }, 
-            { otp, createdAt: new Date() }, 
-            { upsert: true, new: true }
-        );
+        // Remove existing OTPs for this email to avoid duplicates
+        await OTP.deleteMany({ email });
 
+        // Save new OTP
+        await OTP.create({ email, otp });
+
+        // Send Email (Async)
         const emailHtml = `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #e63946; text-align: center;">Loafers Login OTP</h2>
-                <p>Hello,</p>
-                <p>Your verification code for Loafers is:</p>
-                <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333; border-radius: 8px; margin: 20px 0;">
-                    ${otp}
-                </div>
-                <p>This code will expire in 10 minutes.</p>
-                <p style="font-size: 12px; color: #888;">If you didn't request this, please ignore this email.</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="text-align: center; font-weight: bold; color: #e63946;">The Loafers Team</p>
+            <div style="font-family: Arial, sans-serif; color: #333;">
+                <h3>Hello!</h3>
+                <p>Welcome to <strong>Loafers</strong>! We are excited to serve you.</p>
+                <p style="font-size: 16px;">Your Login OTP is: <strong style="font-size: 24px; color: #e63946; letter-spacing: 2px;">${otp}</strong></p>
+                <p>Please enter this code to securely access your account.</p>
+                <p>Get ready to enjoy the best food in town!</p>
+                <br/>
+                <p>Best Regards,<br/><strong>The Loafers Team</strong></p>
             </div>
         `;
-
-        await sendEmail(email, "Your Loafers Verification Code", emailHtml);
-        res.json({ message: "OTP sent successfully" });
-
+        // Send Email (Wait for it)
+        try {
+            await sendEmail(email, "Your Loafers Login OTP", emailHtml);
+            res.json({ message: "OTP sent successfully" });
+        } catch (emailErr) {
+            console.error("Failed to send OTP email:", emailErr);
+            res.status(500).json({ 
+                error: "Failed to send OTP email", 
+                details: emailErr.message 
+            });
+        }
     } catch (err) {
-        console.error("sendOtp error:", err);
-        res.status(500).json({ 
-            error: "Failed to send OTP", 
-            details: err.message 
-        });
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
 };
 
@@ -92,26 +86,39 @@ exports.verifyOtpAndLogin = async (req, res) => {
 
         const otpRecord = await OTP.findOne({ email });
 
-        if (!otpRecord || otpRecord.otp !== otp) {
-            return res.status(400).json({ error: "Invalid or expired OTP" });
+        if (!otpRecord) {
+            return res.status(400).json({ error: "OTP expired or invalid" });
         }
 
-        // Delete OTP after use
-        await OTP.deleteOne({ email });
+        if (otpRecord.otp !== otp) {
+            return res.status(400).json({ error: "Invalid OTP" });
+        }
 
-        // Find or create user
+        // OTP Valid. Check User.
         let user = await User.findOne({ email });
+
         if (!user) {
+            // Create new user
+            const defaultName = email.split('@')[0];
             user = await User.create({
-                name: email.split('@')[0],
+                name: defaultName,
                 email,
                 phone: ''
             });
+        } else {
+            // Update name from default 'Customer' if possible
+            if (user.name === 'Customer') {
+                user.name = email.split('@')[0];
+                await user.save();
+            }
         }
+
+        // Delete used OTP
+        await OTP.deleteMany({ email });
 
         res.json({ message: "Login successful", user });
     } catch (err) {
-        console.error("verifyOtp error:", err);
+        console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
@@ -133,19 +140,25 @@ exports.signup = async (req, res) => {
     try {
         const { name, email, phone, otp } = req.body;
 
+        // Verify OTP
         const otpRecord = await OTP.findOne({ email });
         if (!otpRecord || otpRecord.otp !== otp) {
             return res.status(400).json({ error: "Invalid or expired OTP" });
         }
 
+        // Check if user exists
         let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ error: "User already exists" });
+        if (user) {
+            return res.status(400).json({ error: "Email already exists" });
+        }
 
         user = await User.create({ name, email, phone });
-        await OTP.deleteOne({ email });
+
+        await OTP.deleteMany({ email });
 
         res.json({ message: "Signup successful", user });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };
