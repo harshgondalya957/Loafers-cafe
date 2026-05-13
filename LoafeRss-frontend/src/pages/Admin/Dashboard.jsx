@@ -19,7 +19,7 @@ const Dashboard = () => {
     const [recentOrders, setRecentOrders] = useState([]);
     const [riders, setRiders] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     // Task: Single Retry Guard using Ref for closure stability
     const retryCount = useRef(0);
 
@@ -28,7 +28,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         let isSubscribed = true;
-        fetchDashboardData(); 
+        fetchDashboardData();
 
         // Poll every 10 seconds to get automatic updates
         const intervalId = setInterval(() => {
@@ -79,7 +79,7 @@ const Dashboard = () => {
                 totalRevenue: Number(todayStats.total_revenue) || 0,
                 totalCustomers: (Array.isArray(customers) ? customers : []).length || 0
             });
-            setRecentOrders((Array.isArray(active) ? active : []).slice(0, 10) || []); 
+            setRecentOrders((Array.isArray(active) ? active : []).slice(0, 10) || []);
         } catch (error) {
             console.error("âŒ FETCH ERROR (Internal):", error?.response?.data || error.message);
         } finally {
@@ -106,9 +106,9 @@ const Dashboard = () => {
             const order = (recentOrders || []).find(o => (o.id || o._id) === orderId);
             const currentStatus = order ? order.status : 'pending';
 
-            const response = await axios.put(url, { 
-                status: currentStatus, 
-                rider_id: riderId 
+            const response = await axios.put(url, {
+                status: currentStatus,
+                rider_id: riderId
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -257,4 +257,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

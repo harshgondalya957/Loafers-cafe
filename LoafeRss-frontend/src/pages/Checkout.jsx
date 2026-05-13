@@ -6,6 +6,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLocationContext } from '../context/LocationContext';
 import { useAuth } from '../context/AuthContext';
+import { debugLog } from '../utils/debug';
+import './clover.css';
 
 const Checkout = () => {
     const { currentUser } = useAuth();
@@ -127,7 +129,7 @@ const Checkout = () => {
 
         const payload = {
             orderData: orderData,
-            paymentMethod: paymentMethod === 'card' ? 'CARD' : 'COD'
+            paymentMethod: paymentMethod === 'card' ? 'CARD' : (paymentMethod === 'clover' ? 'CLOVER' : 'COD')
         };
 
         try {
@@ -141,6 +143,34 @@ const Checkout = () => {
 
             if (response.ok) {
                 const data = await response.json();
+                const createdOrderId = data.order?._id || data.id;
+
+                // CLOVER PAYMENT INTEGRATION
+                if (paymentMethod === 'clover') {
+                    try {
+                        const cloverRes = await fetch(`${API_BASE_URL}/auth/clover/payment`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                orderId: createdOrderId,
+                                amount: finalTotal
+                            })
+                        });
+
+                        const cloverData = await cloverRes.json();
+                        if (cloverData.success) {
+                            alert("Payment Successful via Clover!");
+                        } else {
+                            throw new Error(cloverData.error || "Clover payment failed");
+                        }
+                    } catch (err) {
+                        console.error("Clover Error:", err);
+                        alert(`Clover Payment Error: ${err.message}`);
+                        setLoading(false);
+                        return; // Stop here if payment failed
+                    }
+                }
+
                 console.log('Order placed:', data);
 
                 // Clear cart from local storage
@@ -345,6 +375,19 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Clover Option */}
+                                <div
+                                    onClick={() => setPaymentMethod('clover')}
+                                    className={`clover-payment-item ${paymentMethod === 'clover' ? 'active' : ''}`}
+                                >
+                                    <div className="clover-radio">
+                                        {paymentMethod === 'clover' && <div className="clover-radio-inner"></div>}
+                                    </div>
+                                    <FaCreditCard className="text-[#F43F97]" size={20} />
+                                    <span className="font-bold text-gray-700">Pay with Clover</span>
+                                    <span className="clover-badge">Secure</span>
                                 </div>
                             </div>
                         </div>

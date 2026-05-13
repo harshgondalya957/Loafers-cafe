@@ -35,6 +35,7 @@ const deliveryRoutes = require('./routes/deliveryRoutes');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const cloverRoutes = require('./routes/cloverRoutes');
 
 // Use Routes
 app.use('/api/admin', adminRoutes);
@@ -44,6 +45,7 @@ app.use('/api/delivery', deliveryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/auth', cloverRoutes);
 
 // Base route
 app.get('/', (req, res) => {

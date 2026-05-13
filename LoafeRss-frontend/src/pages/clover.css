@@ -1,0 +1,54 @@
+.clover-payment-item {
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+}
+
+.clover-payment-item:hover {
+    border-color: #f43f97;
+    background: #fff5f9;
+}
+
+.clover-payment-item.active {
+    border-color: #f43f97;
+    background: #fff5f9;
+    box-shadow: 0 4px 12px rgba(244, 63, 151, 0.1);
+}
+
+.clover-radio {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clover-payment-item.active .clover-radio {
+    border-color: #f43f97;
+}
+
+.clover-radio-inner {
+    width: 10px;
+    height: 10px;
+    background: #f43f97;
+    border-radius: 50%;
+}
+
+.clover-badge {
+    background: #0070ba;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: auto;
+}

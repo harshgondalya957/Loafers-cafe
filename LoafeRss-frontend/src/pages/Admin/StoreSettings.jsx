@@ -18,7 +18,7 @@ const StoreSettings = () => {
     });
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
-    
+
     // Task: Single Retry Guard using Ref for closure stability
     const retryCount = useRef(0);
 
@@ -26,7 +26,7 @@ const StoreSettings = () => {
 
     useEffect(() => {
         fetchSettings();
-    }, []); 
+    }, []);
 
     const fetchSettings = async () => {
         const url = `${API_BASE_URL}/api/store/settings`;

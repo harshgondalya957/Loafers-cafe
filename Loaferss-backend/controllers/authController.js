@@ -5,7 +5,9 @@ const nodemailer = require('nodemailer');
 // --- Email Config ---
 const getTransporter = () => {
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // use SSL
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
@@ -16,7 +18,7 @@ const getTransporter = () => {
 const sendEmail = async (to, subject, text) => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.error("EMAIL CONFIG MISSING");
-        return;
+        throw new Error("Email configuration is missing on server");
     }
     const transporter = getTransporter();
     try {
@@ -27,8 +29,10 @@ const sendEmail = async (to, subject, text) => {
             html: text
         });
         console.log(`Email sent to ${to}`);
+        return true;
     } catch (error) {
         console.error("Email error:", error);
+        throw error;
     }
 };
 
@@ -57,9 +61,17 @@ exports.sendOtp = async (req, res) => {
                 <p>Best Regards,<br/><strong>The Loafers Team</strong></p>
             </div>
         `;
-        sendEmail(email, "Your Loafers Login OTP", emailHtml);
-
-        res.json({ message: "OTP sent successfully" });
+        // Send Email (Wait for it)
+        try {
+            await sendEmail(email, "Your Loafers Login OTP", emailHtml);
+            res.json({ message: "OTP sent successfully" });
+        } catch (emailErr) {
+            console.error("Failed to send OTP email:", emailErr);
+            res.status(500).json({ 
+                error: "Failed to send OTP email", 
+                details: emailErr.message 
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });

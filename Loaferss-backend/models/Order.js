@@ -39,6 +39,7 @@ const OrderSchema = new mongoose.Schema({
 
     order_type: { type: String, enum: ['delivery', 'pickup', 'dine-in'], default: 'delivery' },
     payment_method: { type: String, default: 'cod' }, // 'card', 'upi', 'cash'
+    payment_status: { type: String, default: 'unpaid' }, // 'unpaid', 'paid', 'failed'
 
     delivery_address: { type: String },
     postcode: { type: String },
