@@ -1,28 +1,39 @@
 const User = require('../models/User');
 const OTP = require('../models/OTP');
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 
-// --- Email Config (Resend API for Render Compatibility) ---
-const RESEND_API_KEY = 're_Ro71RxMB_6QbhgPLcaPZEQBfLUguz1N6a';
+// --- Email Config (Optimized with Pooling) ---
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    pool: true, // Reuse connections
+    maxConnections: 5,
+    maxMessages: 100,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 const sendEmail = async (to, subject, text) => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("EMAIL CONFIG MISSING");
+        throw new Error("Email configuration is missing on server");
+    }
+    
     try {
-        await axios.post('https://api.resend.com/emails', {
-            from: 'Loafers <onboarding@resend.dev>',
-            to: [to],
-            subject: subject,
+        await transporter.sendMail({
+            from: `"Loafers" <${process.env.EMAIL_USER}>`,
+            to,
+            subject,
             html: text
-        }, {
-            headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
         });
-        console.log(`Email sent via Resend to ${to}`);
+        console.log(`Email sent to ${to}`);
         return true;
     } catch (error) {
-        console.error("Resend API Error:", error.response ? error.response.data : error.message);
-        throw new Error(error.response ? error.response.data.message : "Failed to send email via Resend");
+        console.error("Email error:", error);
+        throw error;
     }
 };
 
