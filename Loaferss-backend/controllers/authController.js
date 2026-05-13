@@ -5,9 +5,9 @@ const nodemailer = require('nodemailer');
 // --- Email Config (Optimized with Pooling) ---
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    pool: true, // Reuse connections
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    pool: true,
     maxConnections: 5,
     maxMessages: 100,
     auth: {
