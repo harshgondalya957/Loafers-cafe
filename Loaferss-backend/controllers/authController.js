@@ -4,20 +4,11 @@ const nodemailer = require('nodemailer');
 
 // --- Email Config (Optimized with Pooling) ---
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Port 465 requires secure: true
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : ''
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    family: 4, // Force IPv4 (Crucial for Render)
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 20000
+        pass: process.env.EMAIL_PASS
+    }
 });
 
 const sendEmail = async (to, subject, text) => {
