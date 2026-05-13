@@ -1,51 +1,28 @@
 const User = require('../models/User');
 const OTP = require('../models/OTP');
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
-// --- Email Config (Optimized for Cloud Environments) ---
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // use TLS
-    pool: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 5000, // 5 seconds timeout
-    greetingTimeout: 5000
-});
-
-// Verify connection configuration
-transporter.verify(function (error, success) {
-    if (error) {
-        console.error("SMTP Connection Error:", error);
-    } else {
-        console.log("SMTP Server is ready to take our messages");
-    }
-});
+// --- Email Config (Resend API for Render Compatibility) ---
+const RESEND_API_KEY = 're_Ro71RxMB_6QbhgPLcaPZEQBfLUguz1N6a';
 
 const sendEmail = async (to, subject, text) => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("EMAIL CONFIG MISSING");
-        throw new Error("Email configuration is missing on server");
-    }
-    
     try {
-        await transporter.sendMail({
-            from: `"Loafers" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
+        await axios.post('https://api.resend.com/emails', {
+            from: 'Loafers <onboarding@resend.dev>',
+            to: [to],
+            subject: subject,
             html: text
+        }, {
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
         });
-        console.log(`Email sent to ${to}`);
+        console.log(`Email sent via Resend to ${to}`);
         return true;
     } catch (error) {
-        console.error("Email error:", error);
-        throw error;
+        console.error("Resend API Error:", error.response ? error.response.data : error.message);
+        throw new Error(error.response ? error.response.data.message : "Failed to send email via Resend");
     }
 };
 
