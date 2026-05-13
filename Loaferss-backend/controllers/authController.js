@@ -2,25 +2,26 @@ const User = require('../models/User');
 const OTP = require('../models/OTP');
 const nodemailer = require('nodemailer');
 
-// --- Email Config ---
-const getTransporter = () => {
-    return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // use SSL
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
-};
+// --- Email Config (Optimized with Pooling) ---
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    pool: true, // Reuse connections
+    maxConnections: 5,
+    maxMessages: 100,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 const sendEmail = async (to, subject, text) => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.error("EMAIL CONFIG MISSING");
         throw new Error("Email configuration is missing on server");
     }
-    const transporter = getTransporter();
+    
     try {
         await transporter.sendMail({
             from: `"Loafers" <${process.env.EMAIL_USER}>`,
