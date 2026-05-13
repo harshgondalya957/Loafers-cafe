@@ -17,10 +17,15 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmail = async (to, subject, text) => {
+    console.log("Attempting to send email to:", to);
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("EMAIL CONFIG MISSING");
-        throw new Error("Email configuration is missing on server");
+        console.error("EMAIL CONFIG MISSING: EMAIL_USER or EMAIL_PASS not set");
+        throw new Error("Email configuration is missing on server environment variables");
     }
+    
+    // Debug log for Render (will show in Render logs)
+    console.log(`Using Email User: ${process.env.EMAIL_USER}`);
+    console.log(`Email Pass Length: ${process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0} chars`);
     
     try {
         await transporter.sendMail({
