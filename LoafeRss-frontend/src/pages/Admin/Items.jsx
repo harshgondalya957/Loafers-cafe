@@ -1,307 +1,354 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import API_BASE_URL from '../../config';
-import React, { useEffect, useState } from 'react';
-import { FaPlus, FaTrash, FaEdit, FaEye, FaEyeSlash, FaImage } from 'react-icons/fa';
-import { debugLog } from '../../utils/debug';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 
 const Items = () => {
+    // Data States
     const [items, setItems] = useState([]);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
-    const [customGroups, setCustomGroups] = useState([]);
-    const [form, setForm] = useState({
-        name: '', description: '', image: '', price: '',
-        category_id: '', sub_category_id: '', customization_group_id: '',
-        energy_kcal: '', tags: [], is_active: 1
-    });
-    const [editing, setEditing] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [customizationGroups, setCustomizationGroups] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
 
-    const merchantId = localStorage.getItem("merchantId");
-    const token = localStorage.getItem("token");
+    // Form States
+    const initialFormState = {
+        name: '',
+        price: '',
+        calories: '',
+        category: '',
+        subCategory: '',
+        customizationGroup: 'None',
+        description: '',
+        dietaryTags: { veg: false, vegan: false, glutenFree: false, halal: false },
+        status: 'active', // 'active' or 'inactive'
+        imageUrl: ''
+    };
+    const [formData, setFormData] = useState(initialFormState);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState('');
+    
+    // UI States
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
+    // Fetch Data on Load
     useEffect(() => {
-        if (!merchantId) {
-            console.error("âŒ merchantId missing");
-        }
-        if (!token) {
-            console.error("âŒ token missing");
-        }
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const itemsUrl = `${API_BASE_URL}/api/store/items`;
-        const catUrl = `${API_BASE_URL}/api/store/categories`;
-        const subUrl = `${API_BASE_URL}/api/store/sub-categories`;
-        const groupUrl = `${API_BASE_URL}/api/store/customization-groups`;
+        try {
+            // NOTE: Replace with your actual backend API endpoints if different
+            const itemsRes = await axios.get(`${API_BASE_URL}/api/products`);
+            setItems(itemsRes.data || []);
+            
+            // Example of fetching categories if you have an API for it:
+            // const catRes = await axios.get(`${API_BASE_URL}/api/categories`); 
+            // setCategories(catRes.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
 
-        console.log("âž¡ï¸ API CALL (Items/Data):", itemsUrl, { merchantId, token });
+    // Handle standard input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    // Handle Category Change (To dynamically filter sub-categories)
+    const handleCategoryChange = (e) => {
+        const selectedCat = e.target.value;
+        
+        // Filter sub-categories based on the selected category
+        const filtered = subCategories.filter(sub => sub.category === selectedCat);
+        setFilteredSubCategories(filtered);
+        
+        setFormData({ ...formData, category: selectedCat, subCategory: '' });
+    };
+
+    // Handle Image Upload Selection and Preview
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file)); // Generate image preview
+        }
+    };
+
+    // Handle Dietary Tags Toggle
+    const handleTagToggle = (tag) => {
+        setFormData({
+            ...formData,
+            dietaryTags: { ...formData.dietaryTags, [tag]: !formData.dietaryTags[tag] }
+        });
+    };
+
+    // Handle Publish Status Toggle (Active/Inactive)
+    const handleStatusToggle = () => {
+        setFormData({
+            ...formData,
+            status: formData.status === 'active' ? 'inactive' : 'active'
+        });
+    };
+
+    // Handle Edit Button Click (Populate form with existing data)
+    const handleEdit = (item) => {
+        setIsEditing(true);
+        setEditId(item._id);
+        setFormData({
+            name: item.name || '',
+            price: item.price || '',
+            calories: item.calories || '',
+            category: item.category || '',
+            subCategory: item.subCategory || '',
+            customizationGroup: item.customizationGroup || 'None',
+            description: item.description || '',
+            dietaryTags: item.dietaryTags || { veg: false, vegan: false, glutenFree: false, halal: false },
+            status: item.status || 'active',
+            imageUrl: item.imageUrl || ''
+        });
+        
+        // Reset local image file states since we are loading an existing image URL
+        setImagePreview('');
+        setImageFile(null);
+        
+        // If a category already exists, populate its corresponding sub-categories
+        if (item.category) {
+            const filtered = subCategories.filter(sub => sub.category === item.category);
+            setFilteredSubCategories(filtered);
+        }
+    };
+
+    // Handle Item Deletion
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this item?")) return;
+        try {
+            await axios.delete(`${API_BASE_URL}/api/products/${id}`);
+            alert("✅ Item successfully deleted!"); // Success Alert
+            fetchData(); // Refresh the list
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("❌ Failed to delete item.");
+        }
+    };
+
+    // Handle Form Submit (Insert New or Update Existing)
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
         try {
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const [itemsRes, catRes, subRes, groupRes] = await Promise.all([
-                fetch(itemsUrl, config),
-                fetch(catUrl, config),
-                fetch(subUrl, config),
-                fetch(groupUrl, config)
-            ]);
+            let finalImageUrl = formData.imageUrl;
 
-            if (itemsRes.ok) {
-                const itemsData = await itemsRes.json();
-                debugLog("ITEMS DATA", itemsData);
-                setItems(itemsData || []);
+            // 1. If a new image file is selected, upload it to the backend first
+            if (imageFile) {
+                const uploadData = new FormData();
+                uploadData.append('image', imageFile);
+                const uploadRes = await axios.post(`${API_BASE_URL}/api/admin/upload-image`, uploadData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                if (uploadRes.data.success) {
+                    finalImageUrl = uploadRes.data.imageUrl; // Get the newly uploaded file path
+                } else {
+                    throw new Error("Image upload failed");
+                }
             }
-            if (catRes.ok) {
-                const catData = await catRes.json();
-                debugLog("CATEGORIES DATA", catData);
-                setCategories(catData || []);
+
+            // Prepare the final payload to be saved in the database
+            const itemDataToSave = { ...formData, imageUrl: finalImageUrl };
+
+            // 2. Save or Update the item data
+            if (isEditing) {
+                await axios.put(`${API_BASE_URL}/api/products/${editId}`, itemDataToSave);
+                alert("✅ Item updated successfully!"); // Success Alert
+            } else {
+                await axios.post(`${API_BASE_URL}/api/products`, itemDataToSave);
+                alert("✅ Item added successfully!"); // Success Alert
             }
-            if (subRes.ok) {
-                const subData = await subRes.json();
-                debugLog("SUB CATEGORIES DATA", subData);
-                setSubCategories(subData || []);
-            }
-            if (groupRes.ok) {
-                const groupData = await groupRes.json();
-                debugLog("CUSTOM GROUPS DATA", groupData);
-                setCustomGroups(groupData || []);
-            }
+
+            // 3. Reset form states and refresh the catalogue list
+            setFormData(initialFormState);
+            setImageFile(null);
+            setImagePreview('');
+            setIsEditing(false);
+            setEditId(null);
+            fetchData();
+            
         } catch (error) {
-            console.error("âŒ ERROR IN PAGE (Items/Data):", error.message || error);
+            console.error("Error saving item:", error);
+            alert("❌ Failed to save item. Check console for details.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleTagChange = (tag) => {
-        setForm(prev => {
-            const tags = prev.tags.includes(tag)
-                ? prev.tags.filter(t => t !== tag)
-                : [...prev.tags, tag];
-            return { ...prev, tags };
-        });
+    // Cancel Edit Mode
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditId(null);
+        setFormData(initialFormState);
+        setImageFile(null);
+        setImagePreview('');
     };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const url = editing
-            ? `${API_BASE_URL}/api/store/items/${editing}`
-            : `${API_BASE_URL}/api/store/items`;
-        const method = editing ? 'PUT' : 'POST';
-
-        console.log("âž¡ï¸ API CALL (Submit Item):", url, { merchantId, token });
-
-        try {
-            const res = await fetch(url, {
-                method,
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(form)
-            });
-
-            if (res.ok) {
-                const resData = await res.json();
-                debugLog("SUBMIT ITEM RESPONSE", resData);
-                setForm({
-                    name: '', description: '', image: '', price: '',
-                    category_id: '', sub_category_id: '', customization_group_id: '',
-                    energy_kcal: '', tags: [], is_active: 1
-                });
-                setEditing(null);
-                fetchData();
-            }
-        } catch (error) {
-            console.error("âŒ ERROR IN PAGE (Submit Item):", error.message || error);
-        }
-    };
-
-    const handleToggleStatus = async (item) => {
-        const url = `${API_BASE_URL}/api/store/items/${item._id}/status`;
-        console.log("âž¡ï¸ API CALL (Toggle Status):", url, { merchantId, token });
-
-        try {
-            const newStatus = item.is_active ? 0 : 1;
-            const res = await fetch(url, {
-                method: 'PATCH',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ is_active: newStatus })
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                debugLog("TOGGLE STATUS RESPONSE", resData);
-                fetchData();
-            }
-        } catch (error) {
-            console.error("âŒ ERROR IN PAGE (Toggle Status):", error.message || error);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this item?")) return;
-        const url = `${API_BASE_URL}/api/store/items/${id}`;
-        console.log("âž¡ï¸ API CALL (Delete Item):", url, { merchantId, token });
-
-        try {
-            const res = await fetch(url, { 
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                debugLog("DELETE ITEM RESPONSE", resData);
-                fetchData();
-            }
-        } catch (error) {
-            console.error("âŒ ERROR IN PAGE (Delete Item):", error.message || error);
-        }
-    };
-
-    // Filter sub-cats based on selected category
-    const filteredSubs = subCategories.filter(s => s.category_id == form.category_id);
 
     return (
-        <div className="space-y-6 md:space-y-8">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-primary tracking-tighter px-2 md:px-0">Manage Items</h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* List */}
-                <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-pink-50">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800">Item Catalogue</h3>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full">
-                            <thead>
-                                <tr className="bg-gray-50 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                    <th className="p-4 rounded-l-lg">Name</th>
-                                    <th className="p-4">Price</th>
-                                    <th className="p-4">Category</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4 rounded-r-lg">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {items.map(item => (
-                                    <tr key={item._id} className="hover:bg-primary/5 hover:scale-[1.005] transition-all duration-200 cursor-pointer bg-white">
-                                        <td className="p-4 font-bold text-gray-800">{item.name}</td>
-                                        <td className="p-4 font-bold text-primary">£{item.price}</td>
-                                        <td className="p-4 text-sm text-gray-500">
-                                            {categories.find(c => c._id === item.category_id)?.name || '-'}
-                                        </td>
-                                        <td className="p-4">
-                                            <button onClick={(e) => { e.stopPropagation(); handleToggleStatus(item); }} className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-all transform hover:scale-105 ${item.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                {item.is_active ? <FaEye /> : <FaEyeSlash />} {item.is_active ? 'Live' : 'Draft'}
+        <div className="flex flex-col lg:flex-row gap-6 p-4">
+            {/* Left Column - Item Catalogue Table */}
+            <div className="w-full lg:w-2/3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-6">Item Catalogue</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                        <thead className="text-xs text-gray-400 uppercase border-b border-gray-100">
+                            <tr>
+                                <th className="pb-3 font-semibold">Name</th>
+                                <th className="pb-3 font-semibold">Price</th>
+                                <th className="pb-3 font-semibold">Category</th>
+                                <th className="pb-3 font-semibold">Status</th>
+                                <th className="pb-3 font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {items.map((item) => (
+                                <tr key={item._id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="py-4 font-medium text-gray-800 flex items-center gap-3">
+                                        {/* Display Thumbnail in Table */}
+                                        {item.imageUrl && (
+                                            <img src={item.imageUrl.startsWith('http') ? item.imageUrl : `${API_BASE_URL}${item.imageUrl}`} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+                                        )}
+                                        {item.name}
+                                    </td>
+                                    <td className="py-4 font-medium text-pink-500">£{item.price}</td>
+                                    <td className="py-4 text-gray-500">{item.category}</td>
+                                    <td className="py-4">
+                                        {/* Active/Inactive Badge */}
+                                        {item.status === 'active' ? (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-600 text-xs font-bold rounded-full border border-green-200">
+                                                <FaEye /> LIVE
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-bold rounded-full border border-gray-200">
+                                                HIDDEN
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-4">
+                                        {/* Edit and Delete Action Buttons */}
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 transition-colors">
+                                                <FaEdit size={16} />
                                             </button>
-                                        </td>
-                                        <td className="p-4 flex gap-2">
-                                            <button onClick={(e) => { e.stopPropagation(); setForm(item); setEditing(item._id); }} className="text-blue-400 hover:text-blue-600 transition-transform hover:scale-110"><FaEdit /></button>
-                                            <button onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }} className="text-red-400 hover:text-red-600 transition-transform hover:scale-110"><FaTrash /></button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            <button onClick={() => handleDelete(item._id)} className="text-red-500 hover:text-red-700 transition-colors">
+                                                <FaTrash size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Right Column - Add/Edit Form */}
+            <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="w-1 h-6 bg-pink-500 rounded-full"></span>
+                        {isEditing ? 'Edit Item' : 'Add Item'}
+                    </h2>
+                    {isEditing && (
+                        <button onClick={handleCancelEdit} className="text-xs font-bold text-gray-400 hover:text-gray-600">Cancel</button>
+                    )}
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Name Field */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Name</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm" />
                     </div>
-                </div>
 
-                {/* Form */}
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-pink-50 h-fit sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
-                    <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                        <span className="w-2 h-8 bg-primary rounded-full"></span>
-                        {editing ? 'Edit Item' : 'Add Item'}
-                    </h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Name</label>
-                            <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-pink-200" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Image URL</label>
-                            <div className="flex gap-2">
-                                <input type="text" value={form.image} onChange={e => setForm({ ...form, image: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-pink-200" placeholder="https://..." />
-                                {form.image && <img src={form.image} alt="Preview" className="w-10 h-10 rounded-lg object-cover border border-gray-200" />}
+                    {/* Image Upload Input */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Image Upload</label>
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-gray-50 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100 cursor-pointer" />
+                        
+                        {/* Image Preview Block */}
+                        {(imagePreview || formData.imageUrl) && (
+                            <div className="mt-3 relative inline-block">
+                                <img src={imagePreview || (formData.imageUrl.startsWith('http') ? formData.imageUrl : `${API_BASE_URL}${formData.imageUrl}`)} alt="Preview" className="h-24 w-24 object-cover rounded-xl border border-gray-200 shadow-sm" />
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-bold text-gray-600 mb-2">Price (£)</label>
-                                <input type="number" step="0.01" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-600 mb-2">Calories (kcal)</label>
-                                <input type="number" value={form.energy_kcal} onChange={e => setForm({ ...form, energy_kcal: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Category</label>
-                            <select value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold">
-                                <option value="">Select Category</option>
-                                {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Sub-Category</label>
-                            <select value={form.sub_category_id} onChange={e => setForm({ ...form, sub_category_id: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" disabled={!form.category_id}>
-                                <option value="">Select Sub-Category</option>
-                                {filteredSubs.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Customization Group</label>
-                            <select value={form.customization_group_id} onChange={e => setForm({ ...form, customization_group_id: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold">
-                                <option value="">None</option>
-                                {customGroups.map(g => <option key={g._id} value={g._id}>{g.admin_name}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Description</label>
-                            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold" rows="2"></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-2">Dietary Tags</label>
-                            <div className="flex flex-wrap gap-2">
-                                {['Veg', 'Vegan', 'Gluten Free', 'Halal'].map(tag => (
-                                    <button
-                                        type="button"
-                                        key={tag}
-                                        onClick={() => handleTagChange(tag)}
-                                        className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${form.tags.includes(tag) ? 'bg-primary text-white border-primary' : 'bg-white text-gray-500 border-gray-200 hover:border-primary/50'}`}
-                                    >
-                                        {tag}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <div className="flex-1">
-                                <label className="block text-sm font-bold text-gray-800">Publish Status</label>
-                                <p className="text-xs text-gray-500">Enable to make this item visible to customers</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked={form.is_active === 1} onChange={e => setForm({ ...form, is_active: e.target.checked ? 1 : 0 })} className="sr-only peer" />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                            </label>
-                        </div>
+                        )}
+                    </div>
 
-                        <div className="flex gap-4 pt-4">
-                            <button type="submit" className="flex-1 bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 hover:-translate-y-1 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-2">
-                                {editing ? <FaEdit /> : <FaPlus />} {editing ? 'Update Item' : 'Add Item'}
-                            </button>
-                            {editing && (
-                                <button type="button" onClick={() => { setEditing(null); setForm({ name: '', description: '', image: '', price: '', category_id: '', sub_category_id: '', customization_group_id: '', energy_kcal: '', tags: [], is_active: 1 }); }} className="px-6 py-3 bg-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-300 transition-colors">
-                                    Cancel
-                                </button>
-                            )}
+                    {/* Price and Calories Row */}
+                    <div className="flex gap-4">
+                        <div className="flex-1">
+                            <label className="block text-xs font-bold text-gray-600 mb-1">Price (£)</label>
+                            <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm" />
                         </div>
-                    </form>
-                </div>
+                        <div className="flex-1">
+                            <label className="block text-xs font-bold text-gray-600 mb-1">Calories (kcal)</label>
+                            <input type="number" name="calories" value={formData.calories} onChange={handleChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm" />
+                        </div>
+                    </div>
+
+                    {/* Category Dropdown */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Category</label>
+                        <select name="category" value={formData.category} onChange={handleCategoryChange} required className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-white">
+                            <option value="">Select Category</option>
+                            <option value="Sandwiches">Sandwiches</option>
+                            <option value="Soft Drinks">Soft Drinks</option>
+                            <option value="Chippy">Chippy</option>
+                            <option value="Indian Breakfast">Indian Breakfast</option>
+                            {/* Replace static options with categories.map() if fetching dynamically */}
+                        </select>
+                    </div>
+
+                    {/* Dynamic Sub-Category Dropdown */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Sub-Category</label>
+                        <select name="subCategory" value={formData.subCategory} onChange={handleChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-white">
+                            <option value="">Select Sub-Category</option>
+                            {filteredSubCategories.map((sub, index) => (
+                                <option key={index} value={sub.name}>{sub.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Description Textarea */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Description</label>
+                        <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm resize-none"></textarea>
+                    </div>
+
+                    {/* Publish Status Toggle Component */}
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <p className="text-sm font-bold text-gray-800">Publish Status</p>
+                            <p className="text-xs text-gray-500">Make this item visible</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleStatusToggle}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.status === 'active' ? 'bg-pink-500' : 'bg-gray-300'}`}
+                        >
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.status === 'active' ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                    </div>
+
+                    {/* Final Submit Button */}
+                    <button type="submit" disabled={loading} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-md transition-all">
+                        {loading ? 'Saving...' : (isEditing ? 'Update Item' : 'Add Item')}
+                    </button>
+                </form>
             </div>
         </div>
     );
 };
 
 export default Items;
-
