@@ -19,6 +19,8 @@ app.use(cors({
 }));
 app.use(express.json()); // Built-in middleware
 app.use(express.urlencoded({ extended: true }));
+const path = require('path');
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Request Logging
 app.use((req, res, next) => {
