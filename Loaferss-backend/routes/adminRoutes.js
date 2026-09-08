@@ -1,3 +1,7 @@
+const express = require('express');
+const router = express.Router();
+const adminController = require('../controllers/adminController');
+
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -25,11 +29,6 @@ router.post('/upload-image', upload.single('image'), (req, res) => {
     const imageUrl = `/assets/item-images/${req.file.filename}`;
     res.json({ success: true, imageUrl: imageUrl });
 });
-
-
-const express = require('express');
-const router = express.Router();
-const adminController = require('../controllers/adminController');
 
 // Admin Auth
 router.post('/login', adminController.adminLogin);
