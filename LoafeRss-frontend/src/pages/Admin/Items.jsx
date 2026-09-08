@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../../config';
-import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Items = () => {
     // Data States
@@ -21,7 +21,7 @@ const Items = () => {
         customizationGroup: 'None',
         description: '',
         dietaryTags: { veg: false, vegan: false, glutenFree: false, halal: false },
-        status: 'active', // 'active' or 'inactive'
+        status: 'active',
         imageUrl: ''
     };
     const [formData, setFormData] = useState(initialFormState);
@@ -40,41 +40,45 @@ const Items = () => {
 
     const fetchData = async () => {
         try {
-            // NOTE: Replace with your actual backend API endpoints if different
-            const itemsRes = await axios.get(`${API_BASE_URL}/api/products`);
+            // બધો ડેટા ડેટાબેઝમાંથી એકસાથે લાવવા માટે (API લિંક જરૂર મુજબ બદલવી)
+            const [itemsRes, catRes, subCatRes, custRes] = await Promise.all([
+                axios.get(`${API_BASE_URL}/api/products`).catch(() => ({ data: [] })),
+                axios.get(`${API_BASE_URL}/api/categories`).catch(() => ({ data: [] })),
+                axios.get(`${API_BASE_URL}/api/subcategories`).catch(() => ({ data: [] })), 
+                axios.get(`${API_BASE_URL}/api/customizations`).catch(() => ({ data: [] }))
+            ]);
+
             setItems(itemsRes.data || []);
-            
-            // Example of fetching categories if you have an API for it:
-            // const catRes = await axios.get(`${API_BASE_URL}/api/categories`); 
-            // setCategories(catRes.data);
+            setCategories(catRes.data || []);
+            setSubCategories(subCatRes.data || []);
+            setCustomizationGroups(custRes.data || []);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
 
-    // Handle standard input changes
+    // Handle Input Change
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    // Handle Category Change (To dynamically filter sub-categories)
+    // Handle Category Change (Sub-category ને ડેટાબેઝ મુજબ ફિલ્ટર કરવા માટે)
     const handleCategoryChange = (e) => {
         const selectedCat = e.target.value;
-        
-        // Filter sub-categories based on the selected category
-        const filtered = subCategories.filter(sub => sub.category === selectedCat);
+        const filtered = subCategories.filter(sub => 
+            sub.category === selectedCat || sub.parentCategory === selectedCat
+        );
         setFilteredSubCategories(filtered);
-        
         setFormData({ ...formData, category: selectedCat, subCategory: '' });
     };
 
-    // Handle Image Upload Selection and Preview
+    // Handle Image Upload Selection
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setImageFile(file);
-            setImagePreview(URL.createObjectURL(file)); // Generate image preview
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -86,7 +90,7 @@ const Items = () => {
         });
     };
 
-    // Handle Publish Status Toggle (Active/Inactive)
+    // Handle Status Toggle
     const handleStatusToggle = () => {
         setFormData({
             ...formData,
@@ -94,10 +98,14 @@ const Items = () => {
         });
     };
 
-    // Handle Edit Button Click (Populate form with existing data)
+    // Handle Edit Click
     const handleEdit = (item) => {
         setIsEditing(true);
         setEditId(item._id);
+        
+        const defaultTags = { veg: false, vegan: false, glutenFree: false, halal: false };
+        const itemTags = item.dietaryTags || defaultTags;
+
         setFormData({
             name: item.name || '',
             price: item.price || '',
@@ -106,36 +114,36 @@ const Items = () => {
             subCategory: item.subCategory || '',
             customizationGroup: item.customizationGroup || 'None',
             description: item.description || '',
-            dietaryTags: item.dietaryTags || { veg: false, vegan: false, glutenFree: false, halal: false },
+            dietaryTags: typeof itemTags === 'string' ? JSON.parse(itemTags) : itemTags,
             status: item.status || 'active',
             imageUrl: item.imageUrl || ''
         });
         
-        // Reset local image file states since we are loading an existing image URL
         setImagePreview('');
         setImageFile(null);
-        
-        // If a category already exists, populate its corresponding sub-categories
+
         if (item.category) {
-            const filtered = subCategories.filter(sub => sub.category === item.category);
+            const filtered = subCategories.filter(sub => 
+                sub.category === item.category || sub.parentCategory === item.category
+            );
             setFilteredSubCategories(filtered);
         }
     };
 
-    // Handle Item Deletion
+    // Handle Delete
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         try {
             await axios.delete(`${API_BASE_URL}/api/products/${id}`);
-            alert("✅ Item successfully deleted!"); // Success Alert
-            fetchData(); // Refresh the list
+            alert("✅ Item successfully deleted!");
+            fetchData();
         } catch (error) {
             console.error("Error deleting item:", error);
             alert("❌ Failed to delete item.");
         }
     };
 
-    // Handle Form Submit (Insert New or Update Existing)
+    // Handle Submit
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -143,7 +151,6 @@ const Items = () => {
         try {
             let finalImageUrl = formData.imageUrl;
 
-            // 1. If a new image file is selected, upload it to the backend first
             if (imageFile) {
                 const uploadData = new FormData();
                 uploadData.append('image', imageFile);
@@ -151,25 +158,22 @@ const Items = () => {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 if (uploadRes.data.success) {
-                    finalImageUrl = uploadRes.data.imageUrl; // Get the newly uploaded file path
+                    finalImageUrl = uploadRes.data.imageUrl;
                 } else {
                     throw new Error("Image upload failed");
                 }
             }
 
-            // Prepare the final payload to be saved in the database
             const itemDataToSave = { ...formData, imageUrl: finalImageUrl };
 
-            // 2. Save or Update the item data
             if (isEditing) {
                 await axios.put(`${API_BASE_URL}/api/products/${editId}`, itemDataToSave);
-                alert("✅ Item updated successfully!"); // Success Alert
+                alert("✅ Item updated successfully!");
             } else {
                 await axios.post(`${API_BASE_URL}/api/products`, itemDataToSave);
-                alert("✅ Item added successfully!"); // Success Alert
+                alert("✅ Item added successfully!");
             }
 
-            // 3. Reset form states and refresh the catalogue list
             setFormData(initialFormState);
             setImageFile(null);
             setImagePreview('');
@@ -179,13 +183,12 @@ const Items = () => {
             
         } catch (error) {
             console.error("Error saving item:", error);
-            alert("❌ Failed to save item. Check console for details.");
+            alert("❌ Failed to save item.");
         } finally {
             setLoading(false);
         }
     };
 
-    // Cancel Edit Mode
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditId(null);
@@ -196,7 +199,6 @@ const Items = () => {
 
     return (
         <div className="flex flex-col lg:flex-row gap-6 p-4">
-            {/* Left Column - Item Catalogue Table */}
             <div className="w-full lg:w-2/3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-6">Item Catalogue</h2>
                 <div className="overflow-x-auto">
@@ -214,7 +216,6 @@ const Items = () => {
                             {items.map((item) => (
                                 <tr key={item._id} className="hover:bg-gray-50 transition-colors">
                                     <td className="py-4 font-medium text-gray-800 flex items-center gap-3">
-                                        {/* Display Thumbnail in Table */}
                                         {item.imageUrl && (
                                             <img src={item.imageUrl.startsWith('http') ? item.imageUrl : `${API_BASE_URL}${item.imageUrl}`} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
                                         )}
@@ -223,19 +224,17 @@ const Items = () => {
                                     <td className="py-4 font-medium text-pink-500">£{item.price}</td>
                                     <td className="py-4 text-gray-500">{item.category}</td>
                                     <td className="py-4">
-                                        {/* Active/Inactive Badge */}
-                                        {item.status === 'active' ? (
+                                        {item.status === 'active' || item.status === true ? (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-600 text-xs font-bold rounded-full border border-green-200">
                                                 <FaEye /> LIVE
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-bold rounded-full border border-gray-200">
-                                                HIDDEN
+                                                <FaEyeSlash /> HIDDEN
                                             </span>
                                         )}
                                     </td>
                                     <td className="py-4">
-                                        {/* Edit and Delete Action Buttons */}
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 transition-colors">
                                                 <FaEdit size={16} />
@@ -252,7 +251,6 @@ const Items = () => {
                 </div>
             </div>
 
-            {/* Right Column - Add/Edit Form */}
             <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -260,23 +258,20 @@ const Items = () => {
                         {isEditing ? 'Edit Item' : 'Add Item'}
                     </h2>
                     {isEditing && (
-                        <button onClick={handleCancelEdit} className="text-xs font-bold text-gray-400 hover:text-gray-600">Cancel</button>
+                        <button onClick={handleCancelEdit} type="button" className="text-xs font-bold text-gray-400 hover:text-gray-600">Cancel</button>
                     )}
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Name Field */}
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1">Name</label>
                         <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm" />
                     </div>
 
-                    {/* Image Upload Input */}
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1">Image Upload</label>
                         <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-gray-50 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100 cursor-pointer" />
                         
-                        {/* Image Preview Block */}
                         {(imagePreview || formData.imageUrl) && (
                             <div className="mt-3 relative inline-block">
                                 <img src={imagePreview || (formData.imageUrl.startsWith('http') ? formData.imageUrl : `${API_BASE_URL}${formData.imageUrl}`)} alt="Preview" className="h-24 w-24 object-cover rounded-xl border border-gray-200 shadow-sm" />
@@ -284,7 +279,6 @@ const Items = () => {
                         )}
                     </div>
 
-                    {/* Price and Calories Row */}
                     <div className="flex gap-4">
                         <div className="flex-1">
                             <label className="block text-xs font-bold text-gray-600 mb-1">Price (£)</label>
@@ -296,37 +290,59 @@ const Items = () => {
                         </div>
                     </div>
 
-                    {/* Category Dropdown */}
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1">Category</label>
                         <select name="category" value={formData.category} onChange={handleCategoryChange} required className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-white">
                             <option value="">Select Category</option>
-                            <option value="Sandwiches">Sandwiches</option>
-                            <option value="Soft Drinks">Soft Drinks</option>
-                            <option value="Chippy">Chippy</option>
-                            <option value="Indian Breakfast">Indian Breakfast</option>
-                            {/* Replace static options with categories.map() if fetching dynamically */}
+                            {categories.map((cat, index) => (
+                                <option key={index} value={cat.name || cat.title || cat._id}>{cat.name || cat.title}</option>
+                            ))}
                         </select>
                     </div>
 
-                    {/* Dynamic Sub-Category Dropdown */}
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1">Sub-Category</label>
                         <select name="subCategory" value={formData.subCategory} onChange={handleChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-white">
                             <option value="">Select Sub-Category</option>
                             {filteredSubCategories.map((sub, index) => (
-                                <option key={index} value={sub.name}>{sub.name}</option>
+                                <option key={index} value={sub.name || sub.title || sub._id}>{sub.name || sub.title}</option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Description Textarea */}
+                    {/* Customization Group (હવે પાછું આવી ગયું છે!) */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Customization Group</label>
+                        <select name="customizationGroup" value={formData.customizationGroup} onChange={handleChange} className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-white">
+                            <option value="None">None</option>
+                            {customizationGroups.map((group, index) => (
+                                <option key={index} value={group.name || group.title || group._id}>{group.name || group.title}</option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1">Description</label>
                         <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none text-sm resize-none"></textarea>
                     </div>
 
-                    {/* Publish Status Toggle Component */}
+                    {/* Dietary Tags (આ પણ પાછું આવી ગયું છે!) */}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-2">Dietary Tags</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['veg', 'vegan', 'glutenFree', 'halal'].map((tag) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => handleTagToggle(tag)}
+                                    className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${formData.dietaryTags[tag] ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                >
+                                    {tag === 'glutenFree' ? 'Gluten Free' : tag.charAt(0).toUpperCase() + tag.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                         <div>
                             <p className="text-sm font-bold text-gray-800">Publish Status</p>
@@ -341,7 +357,6 @@ const Items = () => {
                         </button>
                     </div>
 
-                    {/* Final Submit Button */}
                     <button type="submit" disabled={loading} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-md transition-all">
                         {loading ? 'Saving...' : (isEditing ? 'Update Item' : 'Add Item')}
                     </button>
